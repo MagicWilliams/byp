@@ -19,6 +19,7 @@ export interface WordPressPost {
   featured_media: number;
   categories: number[];
   tags: number[];
+  jetpack_featured_media_url?: string;
 }
 
 export interface WordPressPage {
@@ -105,13 +106,28 @@ export async function fetchPost(
   identifier: string | number
 ): Promise<WordPressPost | null> {
   try {
-    const response = await fetch(`${WORDPRESS_API_URL}/posts/${identifier}`);
+    let response;
+    if (typeof identifier === 'string') {
+      // Fetching by slug
+      response = await fetch(`${WORDPRESS_API_URL}/posts?slug=${identifier}`);
+    } else {
+      // Fetching by ID
+      response = await fetch(`${WORDPRESS_API_URL}/posts/${identifier}`);
+    }
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const posts = await response.json();
+
+    // When fetching by slug, the API returns an array.
+    if (Array.isArray(posts)) {
+      return posts.length > 0 ? posts[0] : null;
+    }
+
+    // When fetching by ID, the API returns a single object.
+    return posts;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;

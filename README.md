@@ -7,6 +7,7 @@ A Next.js application for content management and community engagement with WordP
 - **Clean, Modern UI**: Built with Next.js 14 and Tailwind CSS
 - **WordPress Integration**: Stubbed API functions for content retrieval
 - **State Management**: Zustand store for managing WordPress data
+- **Dynamic Articles**: Individual article pages with dynamic routing
 - **Responsive Design**: Mobile-friendly interface
 - **Content Pages**: About, Contact, Terms, and Submissions pages
 - **Navigation**: Consistent header navigation across all pages
@@ -14,6 +15,7 @@ A Next.js application for content management and community engagement with WordP
 ## Pages
 
 - **Home** (`/`): Welcome page with featured content from WordPress
+- **Articles** (`/article/[slug]`): Individual article pages with dynamic routing
 - **About** (`/about`): Company information and mission
 - **Contact** (`/contact`): Contact information and FAQ
 - **Submissions** (`/submissions`): Content submission guidelines and process
@@ -42,6 +44,7 @@ The application uses Zustand for state management with the following structure:
 
 - `PostsSection` - Displays WordPress posts using the store
 - `CategoriesSection` - Displays WordPress categories using the store
+- `ArticleView` - Client component for displaying individual articles
 
 ## WordPress API Integration
 
@@ -81,7 +84,7 @@ WORDPRESS_API_URL=https://blackyouthproject.com/wp-json/wp/v2
 ## Development
 
 - **Framework**: Next.js 14 with App Router
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS with custom prose styles
 - **Language**: TypeScript
 - **State Management**: Zustand
 - **API**: WordPress REST API integration
@@ -99,9 +102,13 @@ byp/
 │   │   └── page.tsx
 │   ├── terms/
 │   │   └── page.tsx
+│   ├── article/
+│   │   └── [slug]/
+│   │       └── page.tsx
 │   ├── components/
 │   │   ├── PostsSection.tsx
-│   │   └── CategoriesSection.tsx
+│   │   ├── CategoriesSection.tsx
+│   │   └── ArticleView.tsx
 │   ├── lib/
 │   │   ├── wordpress.ts
 │   │   ├── store.ts
@@ -152,6 +159,28 @@ export default function MyComponent() {
 }
 ```
 
+## Article Pages
+
+The application supports dynamic article pages at `/article/[slug]`:
+
+### Features
+
+- **Dynamic Routing**: Articles are accessible via their slug
+- **SEO Friendly**: Proper meta tags and structured content
+- **Responsive Design**: Optimized for all device sizes
+- **Typography**: Custom prose styles for better readability
+- **Navigation**: Easy navigation back to home page
+- **Error Handling**: Graceful 404 handling for missing articles
+
+### Usage
+
+```tsx
+// Navigate to an article
+<Link href={`/article/${post.slug}`}>Read Article</Link>
+
+// The article page will automatically fetch and display the content
+```
+
 ## Next Steps
 
 1. **Configure WordPress API**: Update the `WORDPRESS_API_URL` environment variable
@@ -160,6 +189,8 @@ export default function MyComponent() {
 4. **Enhance Content**: Add more dynamic content and features
 5. **SEO Optimization**: Add meta tags and structured data
 6. **Add More Store Features**: Implement caching, pagination, and search
+7. **Related Articles**: Implement related articles functionality
+8. **Comments System**: Add commenting functionality to articles
 
 ## License
 

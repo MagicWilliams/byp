@@ -1,15 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
-import { usePosts } from '../lib/hooks';
+import Link from 'next/link';
+import { useSiteStore } from '../lib/store';
 
 export default function PostsSection() {
-  const { posts, postsLoading, postsError, fetchPosts } = usePosts();
+  const { posts, postsLoading, postsError, fetchPosts } = useSiteStore();
 
   useEffect(() => {
-    // Fetch posts when component mounts
-    fetchPosts({ per_page: 3 });
-  }, [fetchPosts]);
+    // Fetch posts only if the posts array is empty
+    if (posts.length === 0) {
+      fetchPosts({ per_page: 3 });
+    }
+  }, [fetchPosts, posts.length]);
 
   if (postsLoading) {
     return (
@@ -52,14 +55,24 @@ export default function PostsSection() {
               key={post.id}
               className="border rounded-lg p-6 hover:shadow-md transition-shadow"
             >
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">
-                {post.title.rendered}
-              </h4>
+              <Link href={`/article/${post.slug}`} className="block">
+                <h4 className="text-lg font-semibold text-gray-900 mb-2 hover:text-blue-600 transition-colors">
+                  {post.title.rendered}
+                </h4>
+              </Link>
               <p className="text-gray-600 text-sm mb-3">
                 {post.excerpt.rendered.replace(/<[^>]*>/g, '')}
               </p>
-              <div className="text-xs text-gray-500">
-                {new Date(post.date).toLocaleDateString()}
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-gray-500">
+                  {new Date(post.date).toLocaleDateString()}
+                </div>
+                <Link
+                  href={`/article/${post.slug}`}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  Read more →
+                </Link>
               </div>
             </article>
           ))}
