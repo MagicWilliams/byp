@@ -13,8 +13,10 @@ export default function Home() {
 
   useEffect(() => {
     // Pre-fetch posts for the entire page
-    fetchPosts({ per_page: 100, _embed: true } as any);
-    fetchCategories();
+    if (!posts.length) {
+      fetchPosts({ per_page: 100, _embed: true } as any);
+      fetchCategories();
+    }
   }, [fetchPosts, fetchCategories]);
 
   const featuredPost = posts[0] as any;
