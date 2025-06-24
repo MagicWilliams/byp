@@ -1,52 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import Icon from './Icon';
 
 export default function Footer() {
   return (
-    <footer className="bg-black text-white font-gill-sans py-12">
+    <footer className="bg-black text-white font-gill-sans py-6 md:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-        {/* Social Media Icons */}
-        <div className="flex space-x-8 mb-8">
-          <a href="#" className="flex flex-col items-center space-y-2">
-            <Image
-              src="/img/facebook.svg"
-              alt="Facebook"
-              width={24}
-              height={24}
-            />
-            <span>Facebook</span>
-          </a>
-          <a href="#" className="flex flex-col items-center space-y-2">
-            <Image
-              src="/img/instagram.svg"
-              alt="Instagram"
-              width={24}
-              height={24}
-            />
-            <span>Instagram</span>
-          </a>
-          <a href="#" className="flex flex-col items-center space-y-2">
-            <Image
-              src="/img/twitter.svg"
-              alt="Twitter"
-              width={24}
-              height={24}
-            />
-            <span>Twitter</span>
-          </a>
-          <a href="#" className="flex flex-col items-center space-y-2">
-            <Image
-              src="/img/youtube.svg"
-              alt="Youtube"
-              width={24}
-              height={24}
-            />
-            <span>Youtube</span>
-          </a>
-        </div>
-
         {/* Logo */}
-        <div className="mb-8">
+        <div className="mb-12">
           <Image
             src="/img/byp.png"
             alt="Black Youth Project"
@@ -55,8 +16,19 @@ export default function Footer() {
           />
         </div>
 
+        {/* Social Media Icons */}
+        <div className="flex flex-wrap justify-center w-[75%] sm:w-full gap-12 mb-8">
+          <Icon name="Facebook" imagePath="/img/facebook.svg" href="#" />
+          <Icon name="Instagram" imagePath="/img/instagram.svg" href="#" />
+          <Icon name="Twitter" imagePath="/img/twitter.svg" href="#" />
+          <Icon name="Youtube" imagePath="/img/youtube.svg" href="#" />
+        </div>
+
         {/* Navigation Links */}
-        <nav className="flex flex-wrap justify-center space-x-6 mb-8 text-sm">
+        <nav
+          style={{ fontFamily: 'Gill Sans' }}
+          className="w-full max-w-7xl flex flex-wrap text-center font-medium justify-center space-x-4 space-y-4 mb-8 text-sm"
+        >
           <Link href="/byp100">BYP100</Link>
           <Link href="/contact">Contact Us</Link>
           <Link href="/terms">Terms</Link>
@@ -67,15 +39,17 @@ export default function Footer() {
         </nav>
 
         {/* Email Signup */}
-        <form className="flex w-full max-w-md">
+        <form className="w-full max-w-md grid grid-cols-2 gap-0">
           <input
             type="email"
             placeholder="Email address"
+            style={{ fontFamily: 'Gill Sans' }}
             className="flex-grow bg-black border border-white px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-byp-red"
           />
           <button
             type="submit"
-            className="bg-byp-red text-white font-bold px-6 py-2 border border-byp-red"
+            style={{ fontFamily: 'Gill Sans' }}
+            className="bg-[#E71B23] text-white font-medium px-6 py-2 border border-byp-red whitespace-nowrap"
           >
             Sign Up
           </button>

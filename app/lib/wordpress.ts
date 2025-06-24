@@ -20,6 +20,14 @@ export interface WordPressPost {
   categories: number[];
   tags: number[];
   jetpack_featured_media_url?: string;
+  _embedded?: {
+    author: {
+      name: string;
+      description: string;
+      [key: string]: any;
+    }[];
+    'wp:term': (WordPressCategory[] | WordPressTag[])[];
+  };
 }
 
 export interface WordPressPage {
@@ -41,6 +49,7 @@ export interface WordPressCategory {
   slug: string;
   description: string;
   count: number;
+  taxonomy: 'category';
 }
 
 export interface WordPressTag {
@@ -49,6 +58,7 @@ export interface WordPressTag {
   slug: string;
   description: string;
   count: number;
+  taxonomy: 'post_tag';
 }
 
 // WordPress API configuration
@@ -68,6 +78,7 @@ export async function fetchPosts(
     categories?: number[];
     tags?: number[];
     search?: string;
+    _embed?: boolean;
   } = {}
 ): Promise<WordPressPost[]> {
   try {
@@ -109,10 +120,12 @@ export async function fetchPost(
     let response;
     if (typeof identifier === 'string') {
       // Fetching by slug
-      response = await fetch(`${WORDPRESS_API_URL}/posts?slug=${identifier}`);
+      response = await fetch(
+        `${WORDPRESS_API_URL}/posts?slug=${identifier}&_embed`
+      );
     } else {
       // Fetching by ID
-      response = await fetch(`${WORDPRESS_API_URL}/posts/${identifier}`);
+      response = await fetch(`${WORDPRESS_API_URL}/posts/${identifier}?_embed`);
     }
 
     if (!response.ok) {

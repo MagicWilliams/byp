@@ -1,25 +1,21 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
+import { Inter, Playfair_Display, Playfair } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
+const inter = Inter({ subsets: ['latin'] });
 const playfairDisplay = Playfair_Display({
-  variable: '--font-playfair-display',
   subsets: ['latin'],
+  variable: '--font-playfair-display',
+});
+
+const playfair = Playfair({
+  subsets: ['latin'],
+  variable: '--font-playfair',
 });
 
 export const metadata: Metadata = {
-  title: 'BYP - Your Platform for Content and Community',
-  description: 'BYP is a platform for content and community engagement',
+  title: 'BYP',
+  description: 'The Black Youth Project',
 };
 
 export default function RootLayout({
@@ -30,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
+        className={`${inter.className} ${playfair.variable} ${playfairDisplay.variable}`}
       >
         {children}
       </body>

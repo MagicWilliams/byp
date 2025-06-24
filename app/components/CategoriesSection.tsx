@@ -1,59 +1,92 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useCategories } from '../lib/hooks';
+import { useEffect, useState, useMemo } from 'react';
+import { useSiteStore } from '../lib/store';
+import { WordPressPost, WordPressCategory } from '../lib/wordpress';
+import Tag from './Tag';
+import ArticlePreview from './ArticlePreview';
 
-export default function CategoriesSection() {
-  const { categories, categoriesLoading, categoriesError, fetchCategories } =
-    useCategories();
+export default function CategoriesSection({
+  categories,
+}: {
+  categories: any[];
+}) {
+  const { posts, postsLoading, postsError, fetchPosts } = useSiteStore();
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   useEffect(() => {
-    // Fetch categories when component mounts
-    fetchCategories();
-  }, [fetchCategories]);
+    // Fetch a larger number of posts to get a good variety of categories
+    fetchPosts({ per_page: 100, page: 1, _embed: true } as any);
+  }, [fetchPosts]);
 
-  if (categoriesLoading) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Categories</h3>
-        <div className="flex justify-center items-center py-4">
-          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span className="ml-2 text-gray-600">Loading categories...</span>
-        </div>
-      </div>
-    );
+  const filteredPosts = useMemo(() => {
+    if (!selectedCategory) {
+      return posts;
+    }
+    return posts.filter(post => post.categories.includes(selectedCategory));
+  }, [posts, selectedCategory]);
+
+  if (postsLoading) {
+    return <div>Loading categories...</div>;
   }
 
-  if (categoriesError) {
-    return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">Categories</h3>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-          <p className="text-red-600 text-sm">
-            Error loading categories: {categoriesError}
-          </p>
-        </div>
-      </div>
-    );
+  if (postsError) {
+    return <div>Error loading posts for categories: {postsError}</div>;
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-xl font-semibold text-gray-900 mb-4">Categories</h3>
-      {categories.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {categories.map(category => (
-            <span
-              key={category.id}
-              className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded"
+    <section className="py-4 md:py-12 border-t-2 border-white">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Categories column */}
+        <div className="w-full md:w-1/4 flex-shrink-0">
+          <div className=" rounded-lg md:p-6 mb-4 md:mb-0">
+            <h3
+              className="text-2xl font-medium mb-4 text-white"
+              style={{ fontFamily: 'Gill Sans' }}
             >
-              {category.name} ({category.count})
-            </span>
-          ))}
+              CATEGORIES
+            </h3>
+            <ul className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-0">
+              <li>
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`w-full text-left py-1 rounded transition-colors ${
+                    selectedCategory === null
+                      ? 'text-white font-bold'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  All
+                </button>
+              </li>
+              {categories.map(category => (
+                <li key={category.id}>
+                  <button
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`w-full text-left py-1 rounded transition-colors ${
+                      selectedCategory === category.id
+                        ? 'text-white font-bold'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {category.name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      ) : (
-        <p className="text-sm text-gray-500">No categories available.</p>
-      )}
-    </div>
+        {/* Articles grid */}
+        <div className="w-full md:w-3/4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            {filteredPosts.map(post => (
+              <div key={post.id} className="w-full">
+                <ArticlePreview post={post} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
