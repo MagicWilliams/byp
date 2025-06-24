@@ -94,7 +94,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
         </div>
       )}
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 md:py-12 py-4">
         <article>
           <header className="text-center mb-12">
             <h1

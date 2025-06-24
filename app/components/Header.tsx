@@ -99,7 +99,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-white text-lg hover:text-gray-300 font-semibold"
+              className="text-white text-lg hover:text-gray-300 font-medium"
               style={{
                 fontFamily: 'Gill Sans',
               }}
@@ -110,7 +110,7 @@ export default function Header() {
           ))}
           <Link
             href="https://espn.com"
-            className="text-white text-lg hover:text-gray-300 font-semibold"
+            className="text-white text-lg hover:text-gray-300 font-medium"
             style={{
               fontFamily: 'Gill Sans',
             }}
