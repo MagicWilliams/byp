@@ -1,40 +1,17 @@
 import { create } from 'zustand';
+import {
+  WordPressPost,
+  WordPressCategory,
+  WordPressTag,
+  BLEIssue,
+  fetchBlackLifeEverywhereIssues,
+} from './wordpress';
 
-export type WordPressPost = {
-  id: number;
-  title: { rendered: string };
-  content: { rendered: string };
-  excerpt: { rendered: string };
-  slug: string;
-  date: string;
-  modified: string;
-  author: number;
-  featured_media: number;
-  categories: number[];
-  tags: number[];
-  jetpack_featured_media_url?: string;
-};
-
-export type WordPressCategory = {
-  id: number;
-  name: string;
-  slug: string;
-};
-
-export type WordPressTag = {
-  id: number;
-  name: string;
-  slug: string;
-};
-
-export type WordPressIssue = {
-  id: number;
-  title: { rendered: string };
-  content: { rendered: string };
-  slug: string;
-  date: string;
-  modified: string;
-  // Add any other fields you need from the issue object
+export type IssueMapItem = {
+  issue: BLEIssue;
+  tag: WordPressTag | null;
+  posts: WordPressPost[];
+  postCount: number;
 };
 
 async function fetchPosts(
@@ -73,36 +50,27 @@ async function fetchTags(): Promise<WordPressTag[]> {
   return await res.json();
 }
 
-async function fetchBlackLifeEverywherePosts(): Promise<WordPressPost[]> {
-  const res = await fetch('/api/black-life-everywhere');
-  if (!res.ok) throw new Error('Failed to fetch Black Life Everywhere posts');
-  return await res.json();
-}
-
-async function fetchIssues(): Promise<WordPressIssue[]> {
-  const res = await fetch('/api/issues');
-  if (!res.ok) throw new Error('Failed to fetch issues');
-  return await res.json();
-}
-
 interface SiteState {
   posts: WordPressPost[];
   categories: WordPressCategory[];
   tags: WordPressTag[];
-  blackLifeEverywherePosts: WordPressPost[];
-  issues: WordPressIssue[];
+  issues: BLEIssue[];
+  bleIssues: BLEIssue[];
+  bleTags: WordPressTag[];
+  totalIssues: number;
+  totalPosts: number;
 
   postsLoading: boolean;
   categoriesLoading: boolean;
   tagsLoading: boolean;
-  blackLifeEverywhereLoading: boolean;
-  issuesLoading: boolean;
+  bleIssuesLoading: boolean;
+  bleTagsLoading: boolean;
 
   postsError: string | null;
   categoriesError: string | null;
   tagsError: string | null;
-  blackLifeEverywhereError: string | null;
-  issuesError: string | null;
+  bleIssuesError: string | null;
+  bleTagsError: string | null;
 
   fetchPosts: (params?: {
     per_page?: number;
@@ -114,14 +82,21 @@ interface SiteState {
 
   fetchCategories: () => Promise<void>;
   fetchTags: () => Promise<void>;
-  fetchBlackLifeEverywherePosts: () => Promise<void>;
-  fetchIssues: () => Promise<void>;
+  fetchBlackLifeEverywhereIssues: () => Promise<void>;
+  fetchBLETags: () => Promise<void>;
 
   hydrateFromServer: (
     data: Partial<
       Pick<
         SiteState,
-        'posts' | 'categories' | 'tags' | 'blackLifeEverywherePosts' | 'issues'
+        | 'posts'
+        | 'categories'
+        | 'tags'
+        | 'issues'
+        | 'bleIssues'
+        | 'bleTags'
+        | 'totalIssues'
+        | 'totalPosts'
       >
     >
   ) => void;
@@ -129,7 +104,6 @@ interface SiteState {
   clearPosts: () => void;
   clearCategories: () => void;
   clearTags: () => void;
-  clearBlackLifeEverywherePosts: () => void;
   clearIssues: () => void;
   clearErrors: () => void;
 }
@@ -138,20 +112,23 @@ export const useSiteStore = create<SiteState>(set => ({
   posts: [],
   categories: [],
   tags: [],
-  blackLifeEverywherePosts: [],
   issues: [],
+  bleIssues: [],
+  bleTags: [],
+  totalIssues: 0,
+  totalPosts: 0,
 
   postsLoading: false,
   categoriesLoading: false,
   tagsLoading: false,
-  blackLifeEverywhereLoading: false,
-  issuesLoading: false,
+  bleIssuesLoading: false,
+  bleTagsLoading: false,
 
   postsError: null,
   categoriesError: null,
   tagsError: null,
-  blackLifeEverywhereError: null,
-  issuesError: null,
+  bleIssuesError: null,
+  bleTagsError: null,
 
   fetchPosts: async (params = {}) => {
     set({ postsLoading: true, postsError: null });
@@ -198,36 +175,32 @@ export const useSiteStore = create<SiteState>(set => ({
     }
   },
 
-  fetchBlackLifeEverywherePosts: async () => {
-    set({ blackLifeEverywhereLoading: true, blackLifeEverywhereError: null });
-
+  fetchBlackLifeEverywhereIssues: async () => {
+    set({ bleIssuesLoading: true, bleIssuesError: null });
     try {
-      const posts = await fetchBlackLifeEverywherePosts();
-      set({
-        blackLifeEverywherePosts: posts,
-        blackLifeEverywhereLoading: false,
-      });
+      const bleIssues = await fetchBlackLifeEverywhereIssues();
+      set({ bleIssues, bleIssuesLoading: false });
     } catch (error) {
       set({
-        blackLifeEverywhereError:
+        bleIssuesError:
           error instanceof Error
             ? error.message
-            : 'Failed to fetch Black Life Everywhere posts',
-        blackLifeEverywhereLoading: false,
+            : 'Failed to fetch Black Life Everywhere issues',
+        bleIssuesLoading: false,
       });
     }
   },
 
-  fetchIssues: async () => {
-    set({ issuesLoading: true, issuesError: null });
+  fetchBLETags: async () => {
+    set({ bleTagsLoading: true, bleTagsError: null });
     try {
-      const issues = await fetchIssues();
-      set({ issues, issuesLoading: false });
+      const bleTags = await fetchTags();
+      set({ bleTags, bleTagsLoading: false });
     } catch (error) {
       set({
-        issuesError:
-          error instanceof Error ? error.message : 'Failed to fetch issues',
-        issuesLoading: false,
+        bleTagsError:
+          error instanceof Error ? error.message : 'Failed to fetch BLE tags',
+        bleTagsLoading: false,
       });
     }
   },
@@ -237,24 +210,24 @@ export const useSiteStore = create<SiteState>(set => ({
       posts: data.posts ?? state.posts,
       categories: data.categories ?? state.categories,
       tags: data.tags ?? state.tags,
-      blackLifeEverywherePosts:
-        data.blackLifeEverywherePosts ?? state.blackLifeEverywherePosts,
       issues: data.issues ?? state.issues,
+      bleIssues: data.bleIssues ?? state.bleIssues,
+      bleTags: data.bleTags ?? state.bleTags,
+      totalIssues: data.totalIssues ?? state.totalIssues,
+      totalPosts: data.totalPosts ?? state.totalPosts,
     }));
   },
 
   clearPosts: () => set({ posts: [], postsError: null }),
   clearCategories: () => set({ categories: [], categoriesError: null }),
   clearTags: () => set({ tags: [], tagsError: null }),
-  clearBlackLifeEverywherePosts: () =>
-    set({ blackLifeEverywherePosts: [], blackLifeEverywhereError: null }),
-  clearIssues: () => set({ issues: [], issuesError: null }),
+  clearIssues: () => set({ issues: [], bleIssues: [], bleIssuesError: null }),
   clearErrors: () =>
     set({
       postsError: null,
       categoriesError: null,
       tagsError: null,
-      blackLifeEverywhereError: null,
-      issuesError: null,
+      bleIssuesError: null,
+      bleTagsError: null,
     }),
 }));

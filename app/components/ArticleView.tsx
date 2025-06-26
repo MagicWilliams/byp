@@ -78,8 +78,6 @@ export default function ArticleView({ slug }: ArticleViewProps) {
     .flat()
     .filter(term => term.taxonomy === 'post_tag') as WordPressTag[];
 
-  console.log(post);
-
   return (
     <div className="min-h-screen bg-white">
       <Header />

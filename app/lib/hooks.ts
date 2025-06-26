@@ -46,24 +46,88 @@ export const useTags = () => {
   };
 };
 
+// Hook for issues
+export const useIssues = () => {
+  const {
+    issues,
+    bleIssuesLoading,
+    bleIssuesError,
+    fetchBlackLifeEverywhereIssues,
+    clearIssues,
+  } = useSiteStore();
+
+  return {
+    issues,
+    bleIssuesLoading,
+    bleIssuesError,
+    fetchBlackLifeEverywhereIssues,
+    clearIssues,
+  };
+};
+
+// Hook for BLE tags
+export const useBLETags = () => {
+  const { bleTags, bleTagsLoading, bleTagsError, fetchBLETags } =
+    useSiteStore();
+
+  return {
+    bleTags,
+    bleTagsLoading,
+    bleTagsError,
+    fetchBLETags,
+  };
+};
+
+// Hook for Black Life Everywhere data
+export const useBlackLifeEverywhere = () => {
+  const {
+    bleIssues,
+    bleIssuesLoading,
+    bleIssuesError,
+    fetchBlackLifeEverywhereIssues,
+  } = useSiteStore();
+
+  // Function to force refresh by clearing cache and refetching
+  const refreshData = async () => {
+    await fetchBlackLifeEverywhereIssues();
+  };
+
+  return {
+    bleIssues,
+    bleIssuesLoading,
+    bleIssuesError,
+    fetchBlackLifeEverywhereIssues,
+    refreshData,
+  };
+};
+
 // Hook for all site data
 export const useSiteData = () => {
   const {
     posts,
     categories,
     tags,
+    bleTags,
+    bleIssues,
+    bleIssuesLoading,
+    bleIssuesError,
+    bleTagsLoading,
     postsLoading,
     categoriesLoading,
     tagsLoading,
     postsError,
     categoriesError,
     tagsError,
+    bleTagsError,
     fetchPosts,
     fetchCategories,
     fetchTags,
+    fetchBLETags,
+    fetchBlackLifeEverywhereIssues,
     clearPosts,
     clearCategories,
     clearTags,
+    clearIssues,
     clearErrors,
   } = useSiteStore();
 
@@ -71,21 +135,41 @@ export const useSiteData = () => {
     posts,
     categories,
     tags,
+    bleTags,
+    bleIssues,
+    bleIssuesLoading,
+    bleIssuesError,
+    bleTagsLoading,
     postsLoading,
     categoriesLoading,
     tagsLoading,
     postsError,
     categoriesError,
     tagsError,
+    bleTagsError,
     fetchPosts,
     fetchCategories,
     fetchTags,
+    fetchBLETags,
+    fetchBlackLifeEverywhereIssues,
     clearPosts,
     clearCategories,
     clearTags,
+    clearIssues,
     clearErrors,
     // Computed values
-    isLoading: postsLoading || categoriesLoading || tagsLoading,
-    hasErrors: !!(postsError || categoriesError || tagsError),
+    isLoading:
+      postsLoading ||
+      categoriesLoading ||
+      tagsLoading ||
+      bleTagsLoading ||
+      bleIssuesLoading,
+    hasErrors: !!(
+      postsError ||
+      categoriesError ||
+      tagsError ||
+      bleTagsError ||
+      bleIssuesError
+    ),
   };
 };

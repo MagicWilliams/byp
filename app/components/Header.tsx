@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export default function Header() {
+interface HeaderProps {
+  slug?: string;
+}
+
+export default function Header({ slug }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -15,38 +19,44 @@ export default function Header() {
     }
   }, [isMenuOpen]);
 
+  // Determine which logo to use based on the slug prop
+  const logoSrc = slug === 'BLE' ? '/img/ble.svg' : '/img/byp.png';
+  const logoAlt =
+    slug === 'BLE' ? 'Black Life Everywhere' : 'Black Youth Project';
+  const thirdLink = slug === 'BLE' ? '/' : '/black-life-everywhere';
+  const thirdLinkLabel =
+    slug === 'BLE' ? 'BLACK YOUTH PROJECT' : 'BLACK LIFE EVERYWHERE';
+
   const navLinks = [
     { href: '/', label: 'HOME' },
     { href: '/about', label: 'ABOUT' },
-    { href: '/black-life-everywhere', label: 'BLACK LIFE EVERYWHERE' },
+    { href: thirdLink, label: thirdLinkLabel },
     { href: '/get-involved', label: 'GET INVOLVED' },
   ];
+
+  const logoSlug = slug === 'BLE' ? '/black-life-everywhere' : '/';
 
   return (
     <>
       <header className="bg-black text-white font-gill-sans">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex-shrink-0">
-              <Link href="/">
-                <Image
-                  src="/img/byp.png"
-                  alt="Black Youth Project"
-                  width={200}
-                  height={33}
-                />
+              <Link href={logoSlug}>
+                <Image src={logoSrc} alt={logoAlt} width={150} height={33} />
               </Link>
             </div>
-            <nav className="hidden md:flex space-x-8 items-center">
-              {navLinks.map(link => (
+            <nav className="hidden lg:flex space-x-8 items-center">
+              {navLinks.map((link, index) => (
                 <Link
-                  key={link.href}
+                  key={`${link.href}-${index}`}
                   href={link.href}
-                  className="hover:text-gray-300"
+                  className="hover:text-gray-300 whitespace-nowrap uppercase"
                   style={{
                     position: 'relative',
                     top: '3px',
                     fontFamily: 'Gill Sans',
+                    fontWeight: '500',
                   }}
                 >
                   {link.label}
@@ -54,15 +64,16 @@ export default function Header() {
               ))}
               <Link
                 href="https://espn.com"
-                className="bg-[#e71b23] text-white font-bold px-6 pt-2 pb-1 rounded-full hover:bg-byp-red-dark flex items-center justify-center"
+                className="bg-[#e71b23] text-white px-4 pt-2 pb-1 rounded-lg hover:bg-byp-red-dark flex items-center justify-center"
                 style={{
                   fontFamily: 'Gill Sans',
+                  fontWeight: '500',
                 }}
               >
                 DONATE
               </Link>
             </nav>
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
                 <Image src="/img/menu.svg" alt="Menu" width={24} height={24} />
               </button>
@@ -73,7 +84,7 @@ export default function Header() {
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 w-full ${
           isMenuOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setIsMenuOpen(false)}
@@ -95,13 +106,14 @@ export default function Header() {
           </button>
         </div>
         <nav className="flex flex-col items-start space-y-6 mt-8 pl-4">
-          {navLinks.map(link => (
+          {navLinks.map((link, index) => (
             <Link
-              key={link.href}
+              key={`${link.href}-${index}`}
               href={link.href}
               className="text-white text-lg hover:text-gray-300 font-medium"
               style={{
                 fontFamily: 'Gill Sans',
+                fontWeight: '500',
               }}
               onClick={() => setIsMenuOpen(false)}
             >
@@ -113,6 +125,7 @@ export default function Header() {
             className="text-white text-lg hover:text-gray-300 font-medium"
             style={{
               fontFamily: 'Gill Sans',
+              fontWeight: '500',
             }}
             onClick={() => setIsMenuOpen(false)}
           >

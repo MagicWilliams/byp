@@ -1,19 +1,22 @@
 import { NextResponse } from 'next/server';
+import { fetchBlackLifeEverywhereIssues } from '../../lib/wordpress';
 
 export async function GET() {
   try {
-    const res = await fetch(
-      'https://blackyouthproject.com/wp-json/wp/v2/issue?per_page=100'
+    const issues = await fetchBlackLifeEverywhereIssues();
+
+    // Create response with cache control headers to prevent caching
+    const response = NextResponse.json(issues);
+    response.headers.set(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate'
     );
-    if (!res.ok) {
-      return NextResponse.json(
-        { error: 'Failed to fetch issues' },
-        { status: res.status }
-      );
-    }
-    const data = await res.json();
-    return NextResponse.json(data);
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error) {
+    console.error('Error in issues API:', error);
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

@@ -17,17 +17,19 @@ export interface ArticlePreviewProps {
 
 export default function ArticlePreview({ post }: ArticlePreviewProps) {
   return (
-    <div className="flex-shrink-0 w-80 w-full">
+    <div className="flex-shrink-0 w-80 w-full max-w-sm">
       <Link href={`/article/${post.slug}`}>
-        <div className="flex flex-col rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col overflow-hidden">
           {post.jetpack_featured_media_url && (
-            <Image
-              src={post.jetpack_featured_media_url}
-              alt={post.title.rendered}
-              className="w-full h-48 mb-2 object-cover"
-              width={450}
-              height={180}
-            />
+            <div className="relative w-full aspect-[4/3] mb-2">
+              <Image
+                src={post.jetpack_featured_media_url}
+                alt={post.title.rendered}
+                className="object-cover"
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            </div>
           )}
           <div className="">
             <h3

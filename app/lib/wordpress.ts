@@ -61,39 +61,204 @@ export interface WordPressTag {
   taxonomy: 'post_tag';
 }
 
+// New types for BLE Issue with associated posts
+export interface BLEAssociatedPost {
+  ID: number;
+  post_title: string;
+  post_excerpt: string;
+  post_content: string;
+  post_date: string;
+  post_modified: string;
+  post_name: string;
+  guid: string;
+  [key: string]: any;
+}
+
+export interface BLEIssue {
+  id: number;
+  title: { rendered: string };
+  content: { rendered: string };
+  excerpt: { rendered: string };
+  slug: string;
+  date: string;
+  modified: string;
+  featured_media: number;
+  acf: {
+    associated_posts: BLEAssociatedPost[];
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 // WordPress API configuration
 const WORDPRESS_API_URL =
-  process.env.WORDPRESS_API_URL ||
-  'https://blackyouthproject.com/wp-json/wp/v2';
+  process.env.WP_API_URL || 'https://blackyouthproject.com/wp-json/wp/v2';
+
+const getAuthHeader = () => {
+  const username = process.env.WP_USER;
+  const password = process.env.WP_APP_PASSWORD;
+  if (!username || !password) {
+    throw new Error(
+      'Missing WP_USER or WP_APP_PASSWORD in environment variables'
+    );
+  }
+  const encoded = Buffer.from(`${username}:${password}`).toString('base64');
+  return `Basic ${encoded}`;
+};
 
 /**
- * Fetch posts from WordPress API
- * @param params - Query parameters for posts
- * @returns Promise<WordPressPost[]>
+ * Fetch all BLE issues with associated posts from the WordPress REST API
+ * @returns Promise<BLEIssue[]>
  */
-export async function fetchPosts(
+export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
+  try {
+    const timestamp = Date.now();
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/issue?acf_format=standard&_t=${timestamp}`
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const issues: BLEIssue[] = await response.json();
+    const issuesWithImages = await Promise.all(
+      issues.map(async issue => {
+        let featured_image_url: string | null = null;
+        if (issue.featured_media) {
+          featured_image_url = await getFeaturedImageUrl(issue.featured_media);
+        }
+        if (issue.acf && Array.isArray(issue.acf.associated_posts)) {
+          issue.acf.associated_posts = await Promise.all(
+            issue.acf.associated_posts.map(async (post: BLEAssociatedPost) => {
+              try {
+                const wpPostRes = await fetch(
+                  `${WORDPRESS_API_URL}/posts/${post.ID}`
+                );
+                if (!wpPostRes.ok) throw new Error('Post fetch failed');
+                const wpPost = await wpPostRes.json();
+                let authorDetails = null;
+                if (wpPost.author) {
+                  const authorRes = await fetch(
+                    `${WORDPRESS_API_URL}/users/${wpPost.author}`,
+                    {
+                      headers: {
+                        Authorization: getAuthHeader(),
+                      },
+                    }
+                  );
+                  if (authorRes.ok) {
+                    authorDetails = await authorRes.json();
+                  }
+                }
+                return {
+                  ...post,
+                  jetpack_featured_media_url:
+                    wpPost.jetpack_featured_media_url || null,
+                  author: authorDetails,
+                };
+              } catch (err) {
+                console.error('Error fetching associated post or author:', err);
+                return {
+                  ...post,
+                  jetpack_featured_media_url: null,
+                  author: null,
+                };
+              }
+            })
+          );
+        }
+        return {
+          ...issue,
+          featured_image_url,
+        };
+      })
+    );
+    return issuesWithImages;
+  } catch (error) {
+    console.error('Error fetching BLE issues:', error);
+    return [];
+  }
+}
+
+// (The rest of your file, including fetchPosts, fetchPost, fetchPages, etc., stays unchanged from your original input. You can paste it below if you'd like me to refactor those too.)
+
+export async function getFeaturedImageUrl(
+  mediaId: number
+): Promise<string | null> {
+  try {
+    const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const media = await response.json();
+    return media.source_url || null;
+  } catch (error) {
+    console.error('Error fetching featured image:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch tags from WordPress API
+ * @returns Promise<WordPressTag[]>
+ */
+export async function fetchTags(): Promise<WordPressTag[]> {
+  try {
+    const response = await fetch(`${WORDPRESS_API_URL}/tags`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching tags:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch categories from WordPress API
+ * @returns Promise<WordPressCategory[]>
+ */
+export async function fetchCategories(): Promise<WordPressCategory[]> {
+  try {
+    const response = await fetch(`${WORDPRESS_API_URL}/categories`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch pages from WordPress API
+ * @param params - Query parameters for pages
+ * @returns Promise<WordPressPage[]>
+ */
+export async function fetchPages(
   params: {
     per_page?: number;
     page?: number;
-    categories?: number[];
-    tags?: number[];
     search?: string;
-    _embed?: boolean;
   } = {}
-): Promise<WordPressPost[]> {
+): Promise<WordPressPage[]> {
   try {
     const searchParams = new URLSearchParams();
 
     if (params.per_page)
       searchParams.append('per_page', params.per_page.toString());
     if (params.page) searchParams.append('page', params.page.toString());
-    if (params.categories)
-      searchParams.append('categories', params.categories.join(','));
-    if (params.tags) searchParams.append('tags', params.tags.join(','));
     if (params.search) searchParams.append('search', params.search);
 
     const response = await fetch(
-      `${WORDPRESS_API_URL}/posts?${searchParams.toString()}`
+      `${WORDPRESS_API_URL}/pages?${searchParams.toString()}`
     );
 
     if (!response.ok) {
@@ -102,9 +267,8 @@ export async function fetchPosts(
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching posts:', error);
-    // Return mock data for development
-    return getMockPosts();
+    console.error('Error fetching pages:', error);
+    return [];
   }
 }
 
@@ -145,138 +309,4 @@ export async function fetchPost(
     console.error('Error fetching post:', error);
     return null;
   }
-}
-
-/**
- * Fetch pages from WordPress API
- * @param params - Query parameters for pages
- * @returns Promise<WordPressPage[]>
- */
-export async function fetchPages(
-  params: {
-    per_page?: number;
-    page?: number;
-    search?: string;
-  } = {}
-): Promise<WordPressPage[]> {
-  try {
-    const searchParams = new URLSearchParams();
-
-    if (params.per_page)
-      searchParams.append('per_page', params.per_page.toString());
-    if (params.page) searchParams.append('page', params.page.toString());
-    if (params.search) searchParams.append('search', params.search);
-
-    const response = await fetch(
-      `${WORDPRESS_API_URL}/pages?${searchParams.toString()}`
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching pages:', error);
-    return [];
-  }
-}
-
-/**
- * Fetch categories from WordPress API
- * @returns Promise<WordPressCategory[]>
- */
-export async function fetchCategories(): Promise<WordPressCategory[]> {
-  try {
-    const response = await fetch(`${WORDPRESS_API_URL}/categories`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    return [];
-  }
-}
-
-/**
- * Fetch tags from WordPress API
- * @returns Promise<WordPressTag[]>
- */
-export async function fetchTags(): Promise<WordPressTag[]> {
-  try {
-    const response = await fetch(`${WORDPRESS_API_URL}/tags`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching tags:', error);
-    return [];
-  }
-}
-
-/**
- * Get featured image URL for a post
- * @param mediaId - WordPress media ID
- * @returns Promise<string | null>
- */
-export async function getFeaturedImageUrl(
-  mediaId: number
-): Promise<string | null> {
-  try {
-    const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const media = await response.json();
-    return media.source_url || null;
-  } catch (error) {
-    console.error('Error fetching featured image:', error);
-    return null;
-  }
-}
-
-// Mock data for development
-function getMockPosts(): WordPressPost[] {
-  return [
-    {
-      id: 1,
-      title: { rendered: 'Welcome to BYP' },
-      content: {
-        rendered:
-          '<p>This is a sample post content that would be loaded from WordPress.</p>',
-      },
-      excerpt: { rendered: 'A brief excerpt of the post content...' },
-      date: new Date().toISOString(),
-      modified: new Date().toISOString(),
-      slug: 'welcome-to-byp',
-      author: 1,
-      featured_media: 0,
-      categories: [1],
-      tags: [1, 2],
-    },
-    {
-      id: 2,
-      title: { rendered: 'Getting Started with Content Creation' },
-      content: {
-        rendered:
-          '<p>Learn how to create engaging content for our platform.</p>',
-      },
-      excerpt: { rendered: 'Tips and tricks for creating great content...' },
-      date: new Date().toISOString(),
-      modified: new Date().toISOString(),
-      slug: 'getting-started-with-content-creation',
-      author: 1,
-      featured_media: 0,
-      categories: [2],
-      tags: [3, 4],
-    },
-  ];
 }
