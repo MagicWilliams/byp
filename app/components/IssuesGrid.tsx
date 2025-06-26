@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Issue from './Issue';
+import { BLEIssue } from '../lib/wordpress';
 
 interface IssuesGridProps {
-  issues: any[];
+  issues: BLEIssue[];
 }
 
 export default function IssuesGrid({ issues }: IssuesGridProps) {

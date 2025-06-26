@@ -19,6 +19,7 @@ export async function GET() {
 
     return NextResponse.json(data);
   } catch (error) {
+    console.error('Error in tags API:', error);
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

@@ -1,9 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
 import BLEArticlePreview from './BLEArticlePreview';
+import { BLEAssociatedPost, BLEIssue } from '../lib/wordpress';
 
 interface IssueProps {
-  issue: any;
+  issue: BLEIssue;
   index: number;
   collapsed: boolean;
   onToggle: () => void;
@@ -11,7 +12,11 @@ interface IssueProps {
 
 const Issue: React.FC<IssueProps> = ({ issue, index, collapsed, onToggle }) => {
   return (
-    <div className="overflow-hidden" style={{ background: '#EADDFF' }}>
+    <div
+      className="overflow-hidden"
+      style={{ background: '#EADDFF' }}
+      key={index}
+    >
       {/* Issue Header (toggle) */}
       <div className="bg-gradient-to-r from-purple-900/50 to-blue-900/50 p-8">
         <div className="flex items-center justify-between">
@@ -83,9 +88,11 @@ const Issue: React.FC<IssueProps> = ({ issue, index, collapsed, onToggle }) => {
             Table of Contents
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 text-black max-w-7xl mx-auto">
-            {issue.acf.associated_posts.map((post: any, idx: number) => (
-              <BLEArticlePreview key={post.ID} post={post} idx={idx} />
-            ))}
+            {issue.acf.associated_posts.map(
+              (post: BLEAssociatedPost, idx: number) => (
+                <BLEArticlePreview key={post.ID} post={post} idx={idx} />
+              )
+            )}
           </div>
         </div>
       </div>

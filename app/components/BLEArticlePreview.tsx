@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { BLEAssociatedPost } from '../lib/wordpress';
 
 interface BLEArticlePreviewProps {
-  post: any;
+  post: BLEAssociatedPost;
   idx: number;
 }
 

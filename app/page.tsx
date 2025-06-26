@@ -7,6 +7,7 @@ import NewestArticles from './components/NewestArticles';
 import CategoriesSection from './components/CategoriesSection';
 import FeaturedPost from './components/FeaturedPost';
 import { useSiteStore } from './lib/store';
+import { PageResults, WordPressPost } from './lib/wordpress';
 
 export default function Home() {
   const { posts, categories, fetchPosts, fetchCategories } = useSiteStore();
@@ -14,12 +15,12 @@ export default function Home() {
   useEffect(() => {
     // Pre-fetch posts for the entire page
     if (!posts.length) {
-      fetchPosts({ per_page: 100, _embed: true } as any);
+      fetchPosts({ per_page: 100, _embed: true } as unknown as PageResults);
       fetchCategories();
     }
-  }, [fetchPosts, fetchCategories]);
+  }, [fetchPosts, fetchCategories, posts.length]);
 
-  const featuredPost = posts[0] as any;
+  const featuredPost = posts[0] as WordPressPost | undefined;
 
   return (
     <div

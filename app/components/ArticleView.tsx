@@ -2,13 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  fetchPost,
-  WordPressPost,
-  WordPressTag,
-  WordPressCategory,
-} from '../lib/wordpress';
-import { useSiteStore } from '../lib/store';
+import Image from 'next/image';
+
+import { fetchPost, WordPressPost, WordPressTag } from '../lib/wordpress';
 import Header from './Header';
 import Tag from './Tag';
 
@@ -20,8 +16,6 @@ export default function ArticleView({ slug }: ArticleViewProps) {
   const [post, setPost] = useState<WordPressPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const { posts, postsLoading, postsError, fetchPosts } = useSiteStore();
 
   useEffect(() => {
     const loadPost = async () => {
@@ -84,10 +78,12 @@ export default function ArticleView({ slug }: ArticleViewProps) {
 
       {post.jetpack_featured_media_url && (
         <div className="w-full">
-          <img
+          <Image
             src={post.jetpack_featured_media_url}
             alt={post.title.rendered}
             className="w-full h-auto max-h-[75vh] object-cover"
+            width={1000}
+            height={1000}
           />
         </div>
       )}

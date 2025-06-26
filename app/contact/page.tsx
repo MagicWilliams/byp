@@ -43,8 +43,8 @@ export default function Contact() {
               Get in Touch
             </h2>
             <p className="text-gray-600 leading-relaxed mb-6">
-              We'd love to hear from you! Whether you have a question, feedback,
-              or just want to say hello, we're here to help.
+              We&apos;d love to hear from you! Whether you have a question,
+              feedback, or just want to say hello, we&apos;re here to help.
             </p>
           </section>
 

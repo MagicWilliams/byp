@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { fetchBlackLifeEverywhereIssues } from '../lib/wordpress';
@@ -33,11 +34,12 @@ export default async function BlackLifeEverywhere() {
                 {/* Right Column (Image) - appears first on mobile */}
                 {bleIssues[0].featured_image_url && (
                   <div className="flex-1 flex items-center justify-center order-1 lg:order-2 mb-6 lg:mb-0">
-                    <img
+                    <Image
                       src={bleIssues[0].featured_image_url}
                       alt={bleIssues[0].title.rendered}
                       className="shadow-lg object-cover w-full h-96 max-h-[28rem]"
-                      style={{ background: '#222' }}
+                      width={1000}
+                      height={1000}
                     />
                   </div>
                 )}
@@ -91,7 +93,7 @@ export default async function BlackLifeEverywhere() {
           <div className="text-center py-20">
             <div className="text-gray-500 text-2xl mb-4">No issues found</div>
             <p className="text-gray-600 max-w-md mx-auto">
-              Black Life Everywhere issues will appear here once they're
+              Black Life Everywhere issues will appear here once they&apos;re
               published.
             </p>
           </div>

@@ -1,6 +1,12 @@
 // WordPress API integration stubs
 // These functions will be implemented to fetch data from WordPress REST API
 
+export interface WordPressUser {
+  id: number;
+  name: string;
+  description: string;
+}
+
 export interface WordPressPost {
   id: number;
   title: {
@@ -15,7 +21,7 @@ export interface WordPressPost {
   date: string;
   modified: string;
   slug: string;
-  author: number;
+  author: WordPressUser;
   featured_media: number;
   categories: number[];
   tags: number[];
@@ -24,10 +30,18 @@ export interface WordPressPost {
     author: {
       name: string;
       description: string;
-      [key: string]: any;
     }[];
     'wp:term': (WordPressCategory[] | WordPressTag[])[];
   };
+  post_name: string;
+  post_title: string;
+  post_excerpt: string;
+  post_content: string;
+  post_date: string;
+  post_modified: string;
+  post_author: number;
+  post_parent: number;
+  post_type: string;
 }
 
 export interface WordPressPage {
@@ -71,7 +85,14 @@ export interface BLEAssociatedPost {
   post_modified: string;
   post_name: string;
   guid: string;
-  [key: string]: any;
+  jetpack_featured_media_url: string;
+  author: WordPressUser;
+}
+
+export interface PageResults {
+  per_page?: number;
+  page?: number;
+  _embed?: boolean;
 }
 
 export interface BLEIssue {
@@ -83,11 +104,10 @@ export interface BLEIssue {
   date: string;
   modified: string;
   featured_media: number;
+  featured_image_url: string | null;
   acf: {
     associated_posts: BLEAssociatedPost[];
-    [key: string]: any;
   };
-  [key: string]: any;
 }
 
 // WordPress API configuration

@@ -2,21 +2,24 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useSiteStore } from '../lib/store';
-import { WordPressPost, WordPressCategory } from '../lib/wordpress';
-import Tag from './Tag';
 import ArticlePreview from './ArticlePreview';
+import { WordPressCategory, PageResults } from '../lib/wordpress';
 
 export default function CategoriesSection({
   categories,
 }: {
-  categories: any[];
+  categories: WordPressCategory[];
 }) {
   const { posts, postsLoading, postsError, fetchPosts } = useSiteStore();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   useEffect(() => {
     // Fetch a larger number of posts to get a good variety of categories
-    fetchPosts({ per_page: 100, page: 1, _embed: true } as any);
+    fetchPosts({
+      per_page: 100,
+      page: 1,
+      _embed: true,
+    } as unknown as PageResults);
   }, [fetchPosts]);
 
   const filteredPosts = useMemo(() => {

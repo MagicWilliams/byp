@@ -210,9 +210,9 @@ export default function Submissions() {
             </h2>
             <p className="text-gray-600 leading-relaxed">
               If you have any questions about our submission process or
-              guidelines, please don't hesitate to contact us at
-              submissions@byp.com. We're here to help you share your work with
-              our community.
+              guidelines, please don&apos;t hesitate to contact us at
+              submissions@byp.com. We&apos;re here to help you share your work
+              with our community.
             </p>
           </section>
         </div>
