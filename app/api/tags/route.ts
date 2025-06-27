@@ -1,11 +1,20 @@
 // app/api/tags/route.ts
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const slug = searchParams.get('slug');
+
+    // Build query string
+    const queryParams = new URLSearchParams();
+    if (slug) {
+      queryParams.append('slug', slug);
+    }
+
     const wpRes = await fetch(
-      'https://blackyouthproject.com/wp-json/wp/v2/tags'
+      `https://blackyouthproject.com/wp-json/wp/v2/tags?${queryParams.toString()}`
     );
 
     if (!wpRes.ok) {

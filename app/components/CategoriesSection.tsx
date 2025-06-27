@@ -108,11 +108,15 @@ export default function CategoriesSection({
               <div>Error loading posts for categories: {postsError}</div>
             ) : (
               // Show actual articles when loaded
-              filteredPosts.map(post => (
-                <div key={post.id} className="w-full">
-                  <ArticlePreview post={post} />
-                </div>
-              ))
+              filteredPosts.map((post, index) => {
+                if (index > 9) return null;
+                console.log('post', post);
+                return (
+                  <div key={post.id} className="w-full">
+                    <ArticlePreview post={post} />
+                  </div>
+                );
+              })
             )}
           </div>
         </div>

@@ -39,6 +39,92 @@ async function fetchPosts(
   return await res.json();
 }
 
+async function fetchPostsByTagName(
+  tagName: string,
+  params: {
+    per_page?: number;
+    page?: number;
+  } = {}
+): Promise<WordPressPost[]> {
+  // Convert tag name to slug format (lowercase, hyphenated)
+  const slugifiedName = tagName.toLowerCase().replace(/\s+/g, '-');
+
+  // First, fetch the specific tag by slug
+  const tagRes = await fetch(
+    `/api/tags?slug=${encodeURIComponent(slugifiedName)}`
+  );
+  if (!tagRes.ok) throw new Error('Failed to fetch tag');
+  const tags = await tagRes.json();
+
+  const targetTag = tags.find(
+    (tag: WordPressTag) => tag.slug === slugifiedName
+  );
+
+  if (!targetTag) {
+    console.warn(`Tag with slug "${slugifiedName}" not found`);
+    return [];
+  }
+
+  // Now fetch posts with the tag ID
+  const query = new URLSearchParams();
+  query.append('tags', String(targetTag.id));
+
+  // Add other params
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      query.append(key, String(value));
+    }
+  });
+
+  const res = await fetch(`/api/posts?${query.toString()}`);
+  if (!res.ok) throw new Error('Failed to fetch posts by tag');
+  return await res.json();
+}
+
+async function fetchPostsByCategoryName(
+  categoryName: string,
+  params: {
+    per_page?: number;
+    page?: number;
+  } = {}
+): Promise<WordPressPost[]> {
+  // Convert category name to slug format (lowercase, hyphenated)
+  const slugifiedName = categoryName.toLowerCase().replace(/\s+/g, '-');
+
+  // First, fetch the specific category by slug
+  const categoryRes = await fetch(
+    `/api/categories?slug=${encodeURIComponent(slugifiedName)}`
+  );
+  if (!categoryRes.ok) throw new Error('Failed to fetch category');
+  const categories = await categoryRes.json();
+
+  const targetCategory = categories.find(
+    (category: WordPressCategory) => category.slug === slugifiedName
+  );
+
+  if (!targetCategory) {
+    console.warn(`Category with slug "${slugifiedName}" not found`);
+    return [];
+  }
+
+  // Now fetch posts with the category ID, ordered by date (latest first)
+  const query = new URLSearchParams();
+  query.append('categories', String(targetCategory.id));
+  query.append('orderby', 'date');
+  query.append('order', 'desc');
+
+  // Add other params
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined) {
+      query.append(key, String(value));
+    }
+  });
+
+  const res = await fetch(`/api/posts?${query.toString()}`);
+  if (!res.ok) throw new Error('Failed to fetch posts by category');
+  return await res.json();
+}
+
 async function fetchCategories(): Promise<WordPressCategory[]> {
   const res = await fetch('/api/categories');
   if (!res.ok) throw new Error('Failed to fetch categories');
@@ -88,6 +174,24 @@ interface SiteState {
     search?: string;
     force?: boolean;
   }) => Promise<void>;
+
+  fetchPostsByTagName: (
+    tagName: string,
+    params?: {
+      per_page?: number;
+      page?: number;
+      force?: boolean;
+    }
+  ) => Promise<void>;
+
+  fetchPostsByCategoryName: (
+    categoryName: string,
+    params?: {
+      per_page?: number;
+      page?: number;
+      force?: boolean;
+    }
+  ) => Promise<void>;
 
   fetchCategories: (force?: boolean) => Promise<void>;
   fetchTags: (force?: boolean) => Promise<void>;
@@ -175,6 +279,71 @@ export const useSiteStore = create<SiteState>()(
 
         try {
           const posts = await fetchPosts(fetchParams);
+          set({
+            posts,
+            postsLoading: false,
+            postsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            postsError:
+              error instanceof Error ? error.message : 'Failed to fetch posts',
+            postsLoading: false,
+          });
+        }
+      },
+
+      fetchPostsByTagName: async (tagName, params = {}) => {
+        const { force = false, ...fetchParams } = params;
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.posts.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ postsLoading: true, postsError: null });
+
+        try {
+          const posts = await fetchPostsByTagName(tagName, fetchParams);
+          set({
+            posts,
+            postsLoading: false,
+            postsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            postsError:
+              error instanceof Error ? error.message : 'Failed to fetch posts',
+            postsLoading: false,
+          });
+        }
+      },
+
+      fetchPostsByCategoryName: async (categoryName, params = {}) => {
+        const { force = false, ...fetchParams } = params;
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.posts.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ postsLoading: true, postsError: null });
+
+        try {
+          const posts = await fetchPostsByCategoryName(
+            categoryName,
+            fetchParams
+          );
           set({
             posts,
             postsLoading: false,

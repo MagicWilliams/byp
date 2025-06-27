@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { fetchBlackLifeEverywhereIssues } from '../lib/wordpress';
 import IssuesGrid from '../components/IssuesGrid';
+import NewestArticles from '../components/NewestArticles';
 
 export default async function BlackLifeEverywhere() {
   const bleIssues = await fetchBlackLifeEverywhereIssues();
@@ -98,6 +99,10 @@ export default async function BlackLifeEverywhere() {
             </p>
           </div>
         )}
+
+        <div className="w-full mx-auto">
+          <NewestArticles page="ble" />
+        </div>
       </main>
 
       <Footer />

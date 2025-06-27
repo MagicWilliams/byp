@@ -24,6 +24,12 @@ export default function ArticleView({ slug }: ArticleViewProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  interface WordPressTerm {
+    id: number;
+    name: string;
+    taxonomy: string;
+  }
+
   useEffect(() => {
     const loadPost = async () => {
       try {
@@ -36,9 +42,9 @@ export default function ArticleView({ slug }: ArticleViewProps) {
           const terms = postData._embedded?.['wp:term'] || [];
           const tags = terms
             .flat()
-            .filter((term: any) => term.taxonomy === 'post_tag');
+            .filter((term: WordPressTerm) => term.taxonomy === 'post_tag');
           if (tags.length > 0) {
-            const tagIds = tags.map((tag: any) => tag.id);
+            const tagIds = tags.map((tag: WordPressTerm) => tag.id);
             const relatedPosts = await fetchPostsByTags(tagIds, postData.id);
             setRelated(relatedPosts);
           } else {
@@ -88,8 +94,6 @@ export default function ArticleView({ slug }: ArticleViewProps) {
       </div>
     );
   }
-
-  console.log(post);
 
   const author = post._embedded?.author?.[0];
   const terms = post._embedded?.['wp:term'] || [];

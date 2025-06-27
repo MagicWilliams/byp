@@ -319,7 +319,7 @@ export async function fetchPost(
     const posts = await response.json();
 
     // When fetching by slug, the API returns an array.
-    let post = Array.isArray(posts)
+    const post = Array.isArray(posts)
       ? posts.length > 0
         ? posts[0]
         : null

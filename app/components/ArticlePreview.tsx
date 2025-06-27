@@ -13,11 +13,17 @@ export interface ArticlePreviewProps {
       rendered: string;
     };
   };
+  isBle?: boolean;
 }
 
-export default function ArticlePreview({ post }: ArticlePreviewProps) {
+export default function ArticlePreview({
+  post,
+  isBle = false,
+}: ArticlePreviewProps) {
+  const excerptColor = isBle ? 'text-gray-700' : 'text-[#ddd]';
+
   return (
-    <div className="flex-shrink-0 w-80 w-full max-w-sm">
+    <div className="flex-shrink-0 w-80 w-full max-w-sm group">
       <Link href={`/article/${post.slug}`}>
         <div className="flex flex-col overflow-hidden">
           {post.jetpack_featured_media_url && (
@@ -29,15 +35,17 @@ export default function ArticlePreview({ post }: ArticlePreviewProps) {
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
             </div>
           )}
           <div className="">
             <h3
               className="font-medium text-xl mb-2"
+              style={{ fontFamily: 'Gill Sans' }}
               dangerouslySetInnerHTML={{ __html: post.title.rendered }}
             />
             <div
-              className="text-[#ddd] text-md"
+              className={`text-md ${excerptColor}`}
               style={{ fontFamily: 'Playfair' }}
               dangerouslySetInnerHTML={{ __html: post.excerpt.rendered }}
             />

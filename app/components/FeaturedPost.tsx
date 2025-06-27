@@ -129,7 +129,7 @@ export default function FeaturedPost({
                     className="text-md italic mb-4"
                     style={{ fontFamily: 'Playfair Display' }}
                   >
-                    by {author.name}
+                    by {author.name || 'Contributors'}
                   </p>
                 )}
               </div>
