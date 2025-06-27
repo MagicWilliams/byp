@@ -10,23 +10,23 @@ export default function About() {
   return (
     <div className="min-h-screen bg-white w-full">
       <Header />
-      <main className="w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg">
-          <section className="mb-8 text-black">
+          <section className="mb-8 text-black flex flex-col gap-8">
             <h1
-              className="text-3xl font-medium mb-8"
+              className="text-3xl font-medium mb-8 py-8"
               style={{ fontFamily: 'Gill Sans' }}
             >
               About Us
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4  mb-8">
               <h3
-                className="text-lg font-medium"
+                className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
                 Mission Statement
               </h3>
-              <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                 &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                 sed do eiusmod tempor incididunt ut labore et dolore magna
                 aliqua. Ut enim ad minim veniam, quis nostrud exercitation
@@ -39,12 +39,12 @@ export default function About() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
               <h3
-                className="text-lg font-medium"
+                className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
                 Our History
               </h3>
-              <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                 &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit,
                 sed do eiusmod tempor incididunt ut labore et dolore magna
                 aliqua. Ut enim ad minim veniam, quis nostrud exercitation
@@ -57,7 +57,7 @@ export default function About() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
               <h3
-                className="text-lg font-medium"
+                className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
                 Our Team
@@ -72,10 +72,10 @@ export default function About() {
                       width={400}
                       height={400}
                     />
-                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                       {person.name}
                     </p>
-                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                       {person.title}
                     </p>
                   </div>

@@ -1,150 +1,166 @@
-import Link from 'next/link';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function Contact() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <h1 className="text-2xl font-bold text-gray-900">BYP</h1>
-            <nav className="flex space-x-8">
-              <Link href="/" className="text-gray-900 hover:text-gray-600">
-                Home
-              </Link>
-              <Link href="/about" className="text-gray-900 hover:text-gray-600">
-                About
-              </Link>
-              <Link
-                href="/contact"
-                className="text-gray-900 hover:text-gray-600"
+    <div className="min-h-screen bg-white w-full">
+      <Header />
+      <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg">
+          <section className="mb-8 text-black flex flex-col gap-8">
+            <h1
+              className="text-3xl font-medium mb-8 py-8"
+              style={{ fontFamily: 'Gill Sans' }}
+            >
+              Contact Us
+            </h1>
+
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
+              <h3
+                className="text-xl font-medium"
+                style={{ fontFamily: 'Gill Sans' }}
               >
-                Contact
-              </Link>
-              <Link
-                href="/submissions"
-                className="text-gray-900 hover:text-gray-600"
-              >
-                Submissions
-              </Link>
-              <Link href="/terms" className="text-gray-900 hover:text-gray-600">
-                Terms
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-white rounded-lg shadow p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Contact Us</h1>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Get in Touch
-            </h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              We&apos;d love to hear from you! Whether you have a question,
-              feedback, or just want to say hello, we&apos;re here to help.
-            </p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Contact Information
-            </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Email
-                </h3>
-                <p className="text-gray-600">info@byp.com</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Phone
-                </h3>
-                <p className="text-gray-600">+1 (555) 123-4567</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Address
-                </h3>
-                <p className="text-gray-600">
-                  123 Main Street
-                  <br />
-                  City, State 12345
-                  <br />
-                  United States
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Business Hours
-                </h3>
-                <p className="text-gray-600">
-                  Monday - Friday: 9:00 AM - 6:00 PM
-                  <br />
-                  Saturday: 10:00 AM - 4:00 PM
-                  <br />
-                  Sunday: Closed
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Contact Form
-            </h2>
-            <div className="bg-gray-100 rounded-lg p-6">
-              <p className="text-gray-600 mb-4">
-                Our contact form will be integrated here. This will allow users
-                to send us messages directly through the website.
+                Get in Touch
+              </h3>
+              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                We&apos;d love to hear from you! Whether you have a question,
+                feedback, or just want to say hello, we&apos;re here to help.
               </p>
-              <div className="bg-white rounded p-4 border-2 border-dashed border-gray-300">
-                <p className="text-sm text-gray-500 text-center">
-                  Contact form coming soon...
-                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
+              <h3
+                className="text-xl font-medium"
+                style={{ fontFamily: 'Gill Sans' }}
+              >
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-2 gap-8">
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    Email
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    info@byp.com
+                  </p>
+                </div>
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    Phone
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    +1 (555) 123-4567
+                  </p>
+                </div>
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    Address
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    123 Main Street
+                    <br />
+                    City, State 12345
+                    <br />
+                    United States
+                  </p>
+                </div>
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    Business Hours
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    Monday - Friday: 9:00 AM - 6:00 PM
+                    <br />
+                    Saturday: 10:00 AM - 4:00 PM
+                    <br />
+                    Sunday: Closed
+                  </p>
+                </div>
               </div>
             </div>
-          </section>
 
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  How can I submit content?
-                </h3>
-                <p className="text-gray-600">
-                  Visit our Submissions page to learn more about how to
-                  contribute content to our platform.
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
+              <h3
+                className="text-xl font-medium"
+                style={{ fontFamily: 'Gill Sans' }}
+              >
+                Contact Form
+              </h3>
+              <div className="bg-gray-100 rounded-lg p-6">
+                <p className="text-xl mb-4" style={{ fontFamily: 'Playfair' }}>
+                  Our contact form will be integrated here. This will allow
+                  users to send us messages directly through the website.
                 </p>
+                <div className="bg-white rounded p-4 border-2 border-dashed border-gray-300">
+                  <p className="text-sm text-gray-500 text-center">
+                    Contact form coming soon...
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  What are your response times?
-                </h3>
-                <p className="text-gray-600">
-                  We typically respond to inquiries within 24-48 hours during
-                  business days.
-                </p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  Do you offer support?
-                </h3>
-                <p className="text-gray-600">
-                  Yes, we provide comprehensive support for all our users and
-                  partners.
-                </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
+              <h3
+                className="text-xl font-medium"
+                style={{ fontFamily: 'Gill Sans' }}
+              >
+                Frequently Asked Questions
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    How can I submit content?
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    Visit our Submissions page to learn more about how to
+                    contribute content to our platform.
+                  </p>
+                </div>
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    What are your response times?
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    We typically respond to inquiries within 24-48 hours during
+                    business days.
+                  </p>
+                </div>
+                <div>
+                  <h4
+                    className="text-lg font-medium mb-2"
+                    style={{ fontFamily: 'Gill Sans' }}
+                  >
+                    Do you offer support?
+                  </h4>
+                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    Yes, we provide comprehensive support for all our users and
+                    partners.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
