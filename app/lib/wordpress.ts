@@ -319,14 +319,80 @@ export async function fetchPost(
     const posts = await response.json();
 
     // When fetching by slug, the API returns an array.
-    if (Array.isArray(posts)) {
-      return posts.length > 0 ? posts[0] : null;
+    let post = Array.isArray(posts)
+      ? posts.length > 0
+        ? posts[0]
+        : null
+      : posts;
+
+    if (!post) {
+      return null;
     }
 
-    // When fetching by ID, the API returns a single object.
-    return posts;
+    // Extract author information from embedded data
+    if (
+      post._embedded &&
+      post._embedded.author &&
+      post._embedded.author.length > 0
+    ) {
+      const authorData = post._embedded.author[0];
+      post.author = {
+        id: authorData.id || post.post_author,
+        name: authorData.name || '',
+        description: authorData.description || '',
+      };
+    } else if (post.post_author) {
+      // Fallback: fetch author information separately if not embedded
+      try {
+        const authorResponse = await fetch(
+          `${WORDPRESS_API_URL}/users/${post.post_author}`,
+          {
+            headers: {
+              Authorization: getAuthHeader(),
+            },
+          }
+        );
+        if (authorResponse.ok) {
+          const authorData = await authorResponse.json();
+          post.author = {
+            id: authorData.id,
+            name: authorData.name,
+            description: authorData.description,
+          };
+        }
+      } catch (authorError) {
+        console.error('Error fetching author information:', authorError);
+        // Set a default author object if we can't fetch the author
+        post.author = {
+          id: post.post_author,
+          name: 'Unknown Author',
+          description: '',
+        };
+      }
+    }
+
+    return post;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
+}
+
+export async function fetchPostsByTags(
+  tagIds: number[],
+  excludePostId?: number
+): Promise<WordPressPost[]> {
+  if (!tagIds || tagIds.length === 0) return [];
+  // Only use the first tag for matching
+  const params = new URLSearchParams({
+    _embed: '1',
+    tags: String(tagIds[0]),
+    per_page: '3',
+  });
+  if (excludePostId) {
+    params.append('exclude', excludePostId.toString());
+  }
+  const res = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`);
+  if (!res.ok) throw new Error('Failed to fetch related articles');
+  return res.json();
 }

@@ -20,6 +20,18 @@ const config: Config = {
         'gradient-conic':
           'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            img: {
+              width: '100%',
+              height: 'auto',
+              marginTop: '1rem',
+              marginBottom: '1rem',
+            },
+          },
+        },
+      },
     },
   },
   plugins: [require('@tailwindcss/typography')],

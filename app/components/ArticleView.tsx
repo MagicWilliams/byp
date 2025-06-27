@@ -4,9 +4,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-import { fetchPost, WordPressPost, WordPressTag } from '../lib/wordpress';
+import {
+  fetchPost,
+  WordPressPost,
+  WordPressTag,
+  fetchPostsByTags,
+} from '../lib/wordpress';
 import Header from './Header';
 import Tag from './Tag';
+import RelatedArticles from './RelatedArticles';
 
 interface ArticleViewProps {
   slug: string;
@@ -14,6 +20,7 @@ interface ArticleViewProps {
 
 export default function ArticleView({ slug }: ArticleViewProps) {
   const [post, setPost] = useState<WordPressPost | null>(null);
+  const [related, setRelated] = useState<WordPressPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,6 +31,22 @@ export default function ArticleView({ slug }: ArticleViewProps) {
         setError(null);
         const postData = await fetchPost(slug);
         setPost(postData);
+        if (postData) {
+          // Fetch related articles after post is loaded
+          const terms = postData._embedded?.['wp:term'] || [];
+          const tags = terms
+            .flat()
+            .filter((term: any) => term.taxonomy === 'post_tag');
+          if (tags.length > 0) {
+            const tagIds = tags.map((tag: any) => tag.id);
+            const relatedPosts = await fetchPostsByTags(tagIds, postData.id);
+            setRelated(relatedPosts);
+          } else {
+            setRelated([]);
+          }
+        } else {
+          setRelated([]);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load article');
       } finally {
@@ -66,6 +89,8 @@ export default function ArticleView({ slug }: ArticleViewProps) {
     );
   }
 
+  console.log(post);
+
   const author = post._embedded?.author?.[0];
   const terms = post._embedded?.['wp:term'] || [];
   const tags = terms
@@ -73,7 +98,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
     .filter(term => term.taxonomy === 'post_tag') as WordPressTag[];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-1">
       <Header />
 
       {post.jetpack_featured_media_url && (
@@ -81,7 +106,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
           <Image
             src={post.jetpack_featured_media_url}
             alt={post.title.rendered}
-            className="w-full h-auto max-h-[75vh] object-cover"
+            className="w-full h-auto max-h-[80vh] object-cover"
             width={1000}
             height={1000}
           />
@@ -104,9 +129,13 @@ export default function ArticleView({ slug }: ArticleViewProps) {
               </div>
             )}
 
-            <div className="text-center text-sm text-gray-500">
-              {author && <p className="font-medium">by {author.name}</p>}
-              <time dateTime={post.date}>
+            <div className="text-center text-md text-gray-500">
+              {author && (
+                <p style={{ fontFamily: 'Playfair', fontWeight: '100' }}>
+                  by {author.name || 'Contributors'}
+                </p>
+              )}
+              <time dateTime={post.date} style={{ fontFamily: 'Playfair' }}>
                 {new Date(post.date).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',
@@ -116,11 +145,6 @@ export default function ArticleView({ slug }: ArticleViewProps) {
             </div>
           </header>
 
-          <div
-            className="prose prose-lg max-w-7xl mx-auto"
-            dangerouslySetInnerHTML={{ __html: post.content.rendered }}
-          />
-
           {author && author.description && (
             <footer className="mt-16 pt-8 border-t border-gray-200">
               <div className="text-center">
@@ -128,20 +152,21 @@ export default function ArticleView({ slug }: ArticleViewProps) {
               </div>
             </footer>
           )}
-        </article>
 
-        {/* Related Articles Section */}
-        <div className="mt-20">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
-            Related Articles
-          </h2>
-          <div className="bg-white p-6">
-            <p className="text-gray-600 text-center">
-              Related articles functionality coming soon...
-            </p>
+          <div className="w-full">
+            <div
+              className="max-w-7xl mx-auto text-xl text-black border-b-0 article-content"
+              style={{ fontFamily: 'Playfair' }}
+              dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+            />
           </div>
-        </div>
+        </article>
       </main>
+
+      {/* Related Articles Section */}
+      <div className="max-w-7xl mx-auto mb-16">
+        <RelatedArticles articles={related} />
+      </div>
     </div>
   );
 }

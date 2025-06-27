@@ -468,3 +468,14 @@ h1, h2, h3, h4, h5, h6 {
 .prose > :last-child {
   margin-bottom: 0;
 }
+
+.article-content img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem 0; /* Optional: for spacing */
+}
+
+.article-content .wp-caption {
+  width: 100% !important;
+}
