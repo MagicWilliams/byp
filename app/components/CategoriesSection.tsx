@@ -5,6 +5,31 @@ import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
 import { WordPressCategory, PageResults } from '../lib/wordpress';
 
+// Skeleton component for article previews in grid layout
+function ArticlePreviewSkeleton() {
+  return (
+    <div className="w-full">
+      <div className="flex flex-col overflow-hidden">
+        {/* Image skeleton */}
+        <div className="relative w-full aspect-[4/3] mb-2">
+          <div className="w-full h-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded-md"></div>
+        </div>
+        {/* Title skeleton */}
+        <div className="mb-2">
+          <div className="h-6 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded mb-2"></div>
+          <div className="h-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded w-3/4"></div>
+        </div>
+        {/* Excerpt skeleton */}
+        <div className="space-y-2">
+          <div className="h-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded"></div>
+          <div className="h-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded w-5/6"></div>
+          <div className="h-4 bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded w-4/5"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function CategoriesSection({
   categories,
 }: {
@@ -28,14 +53,6 @@ export default function CategoriesSection({
     }
     return posts.filter(post => post.categories.includes(selectedCategory));
   }, [posts, selectedCategory]);
-
-  if (postsLoading) {
-    return <div>Loading categories...</div>;
-  }
-
-  if (postsError) {
-    return <div>Error loading posts for categories: {postsError}</div>;
-  }
 
   return (
     <section className="py-4 md:py-12 border-t-2 border-white">
@@ -82,11 +99,21 @@ export default function CategoriesSection({
         {/* Articles grid */}
         <div className="w-full md:w-3/4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
-            {filteredPosts.map(post => (
-              <div key={post.id} className="w-full">
-                <ArticlePreview post={post} />
-              </div>
-            ))}
+            {postsLoading ? (
+              // Show skeleton loaders while loading
+              Array.from({ length: 9 }).map((_, index) => (
+                <ArticlePreviewSkeleton key={index} />
+              ))
+            ) : postsError ? (
+              <div>Error loading posts for categories: {postsError}</div>
+            ) : (
+              // Show actual articles when loaded
+              filteredPosts.map(post => (
+                <div key={post.id} className="w-full">
+                  <ArticlePreview post={post} />
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

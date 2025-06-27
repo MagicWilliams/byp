@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import {
   WordPressPost,
   WordPressCategory,
@@ -72,18 +73,26 @@ interface SiteState {
   bleIssuesError: string | null;
   bleTagsError: string | null;
 
+  // Cache timestamps for data freshness
+  postsLastFetched: number | null;
+  categoriesLastFetched: number | null;
+  tagsLastFetched: number | null;
+  bleIssuesLastFetched: number | null;
+  bleTagsLastFetched: number | null;
+
   fetchPosts: (params?: {
     per_page?: number;
     page?: number;
     categories?: number[];
     tags?: number[];
     search?: string;
+    force?: boolean;
   }) => Promise<void>;
 
-  fetchCategories: () => Promise<void>;
-  fetchTags: () => Promise<void>;
-  fetchBlackLifeEverywhereIssues: () => Promise<void>;
-  fetchBLETags: () => Promise<void>;
+  fetchCategories: (force?: boolean) => Promise<void>;
+  fetchTags: (force?: boolean) => Promise<void>;
+  fetchBlackLifeEverywhereIssues: (force?: boolean) => Promise<void>;
+  fetchBLETags: (force?: boolean) => Promise<void>;
 
   hydrateFromServer: (
     data: Partial<
@@ -106,128 +115,278 @@ interface SiteState {
   clearTags: () => void;
   clearIssues: () => void;
   clearErrors: () => void;
+  clearCache: () => void;
 }
 
-export const useSiteStore = create<SiteState>(set => ({
-  posts: [],
-  categories: [],
-  tags: [],
-  issues: [],
-  bleIssues: [],
-  bleTags: [],
-  totalIssues: 0,
-  totalPosts: 0,
+// Cache duration in milliseconds (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000;
 
-  postsLoading: false,
-  categoriesLoading: false,
-  tagsLoading: false,
-  bleIssuesLoading: false,
-  bleTagsLoading: false,
+// Helper function to check if data is stale
+function isDataStale(lastFetched: number | null): boolean {
+  if (!lastFetched) return true;
+  return Date.now() - lastFetched > CACHE_DURATION;
+}
 
-  postsError: null,
-  categoriesError: null,
-  tagsError: null,
-  bleIssuesError: null,
-  bleTagsError: null,
+export const useSiteStore = create<SiteState>()(
+  persist(
+    (set, get) => ({
+      posts: [],
+      categories: [],
+      tags: [],
+      issues: [],
+      bleIssues: [],
+      bleTags: [],
+      totalIssues: 0,
+      totalPosts: 0,
 
-  fetchPosts: async (params = {}) => {
-    set({ postsLoading: true, postsError: null });
+      postsLoading: false,
+      categoriesLoading: false,
+      tagsLoading: false,
+      bleIssuesLoading: false,
+      bleTagsLoading: false,
 
-    try {
-      const posts = await fetchPosts(params);
-      set({ posts, postsLoading: false });
-    } catch (error) {
-      set({
-        postsError:
-          error instanceof Error ? error.message : 'Failed to fetch posts',
-        postsLoading: false,
-      });
-    }
-  },
-
-  fetchCategories: async () => {
-    set({ categoriesLoading: true, categoriesError: null });
-
-    try {
-      const categories = await fetchCategories();
-      set({ categories, categoriesLoading: false });
-    } catch (error) {
-      set({
-        categoriesError:
-          error instanceof Error ? error.message : 'Failed to fetch categories',
-        categoriesLoading: false,
-      });
-    }
-  },
-
-  fetchTags: async () => {
-    set({ tagsLoading: true, tagsError: null });
-
-    try {
-      const tags = await fetchTags();
-      set({ tags, tagsLoading: false });
-    } catch (error) {
-      set({
-        tagsError:
-          error instanceof Error ? error.message : 'Failed to fetch tags',
-        tagsLoading: false,
-      });
-    }
-  },
-
-  fetchBlackLifeEverywhereIssues: async () => {
-    set({ bleIssuesLoading: true, bleIssuesError: null });
-    try {
-      const bleIssues = await fetchBlackLifeEverywhereIssues();
-      set({ bleIssues, bleIssuesLoading: false });
-    } catch (error) {
-      set({
-        bleIssuesError:
-          error instanceof Error
-            ? error.message
-            : 'Failed to fetch Black Life Everywhere issues',
-        bleIssuesLoading: false,
-      });
-    }
-  },
-
-  fetchBLETags: async () => {
-    set({ bleTagsLoading: true, bleTagsError: null });
-    try {
-      const bleTags = await fetchTags();
-      set({ bleTags, bleTagsLoading: false });
-    } catch (error) {
-      set({
-        bleTagsError:
-          error instanceof Error ? error.message : 'Failed to fetch BLE tags',
-        bleTagsLoading: false,
-      });
-    }
-  },
-
-  hydrateFromServer: data => {
-    set(state => ({
-      posts: data.posts ?? state.posts,
-      categories: data.categories ?? state.categories,
-      tags: data.tags ?? state.tags,
-      issues: data.issues ?? state.issues,
-      bleIssues: data.bleIssues ?? state.bleIssues,
-      bleTags: data.bleTags ?? state.bleTags,
-      totalIssues: data.totalIssues ?? state.totalIssues,
-      totalPosts: data.totalPosts ?? state.totalPosts,
-    }));
-  },
-
-  clearPosts: () => set({ posts: [], postsError: null }),
-  clearCategories: () => set({ categories: [], categoriesError: null }),
-  clearTags: () => set({ tags: [], tagsError: null }),
-  clearIssues: () => set({ issues: [], bleIssues: [], bleIssuesError: null }),
-  clearErrors: () =>
-    set({
       postsError: null,
       categoriesError: null,
       tagsError: null,
       bleIssuesError: null,
       bleTagsError: null,
+
+      // Cache timestamps
+      postsLastFetched: null,
+      categoriesLastFetched: null,
+      tagsLastFetched: null,
+      bleIssuesLastFetched: null,
+      bleTagsLastFetched: null,
+
+      fetchPosts: async (params = {}) => {
+        const { force = false, ...fetchParams } = params;
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.posts.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ postsLoading: true, postsError: null });
+
+        try {
+          const posts = await fetchPosts(fetchParams);
+          set({
+            posts,
+            postsLoading: false,
+            postsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            postsError:
+              error instanceof Error ? error.message : 'Failed to fetch posts',
+            postsLoading: false,
+          });
+        }
+      },
+
+      fetchCategories: async (force = false) => {
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.categories.length > 0 &&
+          !isDataStale(state.categoriesLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ categoriesLoading: true, categoriesError: null });
+
+        try {
+          const categories = await fetchCategories();
+          set({
+            categories,
+            categoriesLoading: false,
+            categoriesLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            categoriesError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch categories',
+            categoriesLoading: false,
+          });
+        }
+      },
+
+      fetchTags: async (force = false) => {
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.tags.length > 0 &&
+          !isDataStale(state.tagsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ tagsLoading: true, tagsError: null });
+
+        try {
+          const tags = await fetchTags();
+          set({
+            tags,
+            tagsLoading: false,
+            tagsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            tagsError:
+              error instanceof Error ? error.message : 'Failed to fetch tags',
+            tagsLoading: false,
+          });
+        }
+      },
+
+      fetchBlackLifeEverywhereIssues: async (force = false) => {
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.bleIssues.length > 0 &&
+          !isDataStale(state.bleIssuesLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ bleIssuesLoading: true, bleIssuesError: null });
+        try {
+          const bleIssues = await fetchBlackLifeEverywhereIssues();
+          set({
+            bleIssues,
+            bleIssuesLoading: false,
+            bleIssuesLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            bleIssuesError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch Black Life Everywhere issues',
+            bleIssuesLoading: false,
+          });
+        }
+      },
+
+      fetchBLETags: async (force = false) => {
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.bleTags.length > 0 &&
+          !isDataStale(state.bleTagsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ bleTagsLoading: true, bleTagsError: null });
+        try {
+          const bleTags = await fetchTags();
+          set({
+            bleTags,
+            bleTagsLoading: false,
+            bleTagsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            bleTagsError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch BLE tags',
+            bleTagsLoading: false,
+          });
+        }
+      },
+
+      hydrateFromServer: data => {
+        set(state => ({
+          posts: data.posts ?? state.posts,
+          categories: data.categories ?? state.categories,
+          tags: data.tags ?? state.tags,
+          issues: data.issues ?? state.issues,
+          bleIssues: data.bleIssues ?? state.bleIssues,
+          bleTags: data.bleTags ?? state.bleTags,
+          totalIssues: data.totalIssues ?? state.totalIssues,
+          totalPosts: data.totalPosts ?? state.totalPosts,
+        }));
+      },
+
+      clearPosts: () =>
+        set({
+          posts: [],
+          postsError: null,
+          postsLastFetched: null,
+        }),
+      clearCategories: () =>
+        set({
+          categories: [],
+          categoriesError: null,
+          categoriesLastFetched: null,
+        }),
+      clearTags: () =>
+        set({
+          tags: [],
+          tagsError: null,
+          tagsLastFetched: null,
+        }),
+      clearIssues: () =>
+        set({
+          issues: [],
+          bleIssues: [],
+          bleIssuesError: null,
+          bleIssuesLastFetched: null,
+        }),
+      clearErrors: () =>
+        set({
+          postsError: null,
+          categoriesError: null,
+          tagsError: null,
+          bleIssuesError: null,
+          bleTagsError: null,
+        }),
+      clearCache: () =>
+        set({
+          postsLastFetched: null,
+          categoriesLastFetched: null,
+          tagsLastFetched: null,
+          bleIssuesLastFetched: null,
+          bleTagsLastFetched: null,
+        }),
     }),
-}));
+    {
+      name: 'byp-store', // unique name for localStorage key
+      storage: createJSONStorage(() => localStorage),
+      // Only persist data, not loading states or errors
+      partialize: state => ({
+        posts: state.posts,
+        categories: state.categories,
+        tags: state.tags,
+        issues: state.issues,
+        bleIssues: state.bleIssues,
+        bleTags: state.bleTags,
+        totalIssues: state.totalIssues,
+        totalPosts: state.totalPosts,
+        postsLastFetched: state.postsLastFetched,
+        categoriesLastFetched: state.categoriesLastFetched,
+        tagsLastFetched: state.tagsLastFetched,
+        bleIssuesLastFetched: state.bleIssuesLastFetched,
+        bleTagsLastFetched: state.bleTagsLastFetched,
+      }),
+    }
+  )
+);
