@@ -110,7 +110,6 @@ export default function CategoriesSection({
               // Show actual articles when loaded
               filteredPosts.map((post, index) => {
                 if (index > 9) return null;
-                console.log('post', post);
                 return (
                   <div key={post.id} className="w-full">
                     <ArticlePreview post={post} />

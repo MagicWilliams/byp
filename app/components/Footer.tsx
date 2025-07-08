@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import Icon from './Icon';
+import EmailSubscribe from './EmailSubscribe';
 
 export default function Footer() {
   return (
@@ -39,21 +40,7 @@ export default function Footer() {
         </nav>
 
         {/* Email Signup */}
-        <form className="w-full max-w-md grid grid-cols-2 gap-0">
-          <input
-            type="email"
-            placeholder="Email address"
-            style={{ fontFamily: 'Gill Sans' }}
-            className="flex-grow bg-black border border-white px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-byp-red"
-          />
-          <button
-            type="submit"
-            style={{ fontFamily: 'Gill Sans' }}
-            className="bg-[#E71B23] text-white font-medium px-6 py-2 border border-byp-red whitespace-nowrap"
-          >
-            Sign Up
-          </button>
-        </form>
+        <EmailSubscribe />
       </div>
     </footer>
   );
