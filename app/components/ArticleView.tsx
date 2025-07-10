@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+import styles from '../styles/ArticleView.module.css';
+
 import {
   fetchPost,
   WordPressPost,
@@ -159,7 +161,10 @@ export default function ArticleView({ slug }: ArticleViewProps) {
 
           <div className="w-full">
             <div
-              className="max-w-7xl mx-auto text-xl text-black border-b-0 article-content"
+              className={
+                styles.article +
+                ' max-w-7xl mx-auto text-xl text-black border-b-0 article-content'
+              }
               style={{ fontFamily: 'Playfair' }}
               dangerouslySetInnerHTML={{ __html: post.content.rendered }}
             />
@@ -168,7 +173,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
       </main>
 
       {/* Related Articles Section */}
-      <div className="max-w-7xl mx-auto mb-16">
+      <div className="max-w-7xl mx-auto mb-16 px-4 sm:px-6 lg:px-8">
         <RelatedArticles articles={related} />
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
+import Image from 'next/image';
 
 interface NewestArticlesProps {
   page?: string;
@@ -77,8 +78,8 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
       }`}
     >
       <h2
-        className="text-2xl font-bold text-left mb-8 font-medium"
-        style={{ fontFamily: 'Gill Sans' }}
+        className="text-2xl text-left mb-8"
+        style={{ fontFamily: 'Playfair Display', fontWeight: '800' }}
       >
         NEWEST ARTICLES
       </h2>
@@ -102,6 +103,14 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
               />
             ))
         )}
+      </div>
+      <div className="flex justify-end">
+        <Image
+          src="/img/arrow.svg"
+          alt="Scroll to the right for additional articles."
+          width={50}
+          height={33}
+        />
       </div>
     </section>
   );

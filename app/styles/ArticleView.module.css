@@ -1,0 +1,33 @@
+.article p {
+  margin-bottom: 1.25rem;
+  line-height: 1.4;
+}
+
+.article h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.article h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.article h3 {
+  font-size: 1.5rem;
+}
+
+.article h4 {
+  font-size: 1.25rem;
+}
+
+.article h5 {
+  font-size: 1rem;
+}
+
+.article a {
+  text-decoration: underline;
+  color: #d90103;
+}

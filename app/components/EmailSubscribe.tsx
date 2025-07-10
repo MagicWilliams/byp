@@ -24,9 +24,14 @@ export default function EmailSubscribe() {
       setStatus('success');
       setMessage('You’ve been subscribed!');
       setEmail('');
-    } catch (err: any) {
-      setStatus('error');
-      setMessage(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setStatus('error');
+        setMessage(err.message);
+      } else {
+        setStatus('error');
+        setMessage('An unknown error occurred');
+      }
     }
   };
 

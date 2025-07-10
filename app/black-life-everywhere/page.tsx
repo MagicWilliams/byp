@@ -30,7 +30,7 @@ export default async function BlackLifeEverywhere() {
             )}
 
             {/* Content */}
-            <div className="relative z-10 p-8">
+            <div className="relative z-10 p-8 max-w-7xl mx-auto">
               <div className="flex flex-col lg:flex-row gap-8 items-stretch">
                 {/* Right Column (Image) - appears first on mobile */}
                 {bleIssues[0].featured_image_url && (

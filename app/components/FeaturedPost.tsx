@@ -101,7 +101,7 @@ export default function FeaturedPost({
         </div>
       </Link>
 
-      <div className="relative z-10">
+      <div className="relative z-10 max-w-7xl mx-auto">
         <div className="mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="grid md:grid-cols-1 gap-8 items-center w-full">
             {/* Left Column */}
