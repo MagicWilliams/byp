@@ -63,7 +63,7 @@ export default function Header({ slug }: HeaderProps) {
                 </Link>
               ))}
               <Link
-                href="https://espn.com"
+                href="https://giving.uchicago.edu/site/Donation2?df_id=1714&mfc_pref=T&1714.donation=form1"
                 className="bg-[#e71b23] text-white px-4 pt-2 pb-1 rounded-lg hover:bg-byp-red-dark flex items-center justify-center"
                 style={{
                   fontFamily: 'Gill Sans',
@@ -121,7 +121,7 @@ export default function Header({ slug }: HeaderProps) {
             </Link>
           ))}
           <Link
-            href="https://espn.com"
+            href="https://giving.uchicago.edu/site/Donation2?df_id=1714&mfc_pref=T&1714.donation=form1"
             className="text-white text-lg hover:text-gray-300 font-medium"
             style={{
               fontFamily: 'Gill Sans',

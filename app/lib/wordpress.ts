@@ -215,7 +215,9 @@ export async function getFeaturedImageUrl(
     const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(
+        `HTTP error! status: ${response.status}, mediaId: ${mediaId}`
+      );
     }
 
     const media = await response.json();

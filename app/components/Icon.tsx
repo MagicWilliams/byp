@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface IconProps {
   name: string;
@@ -26,9 +27,9 @@ export default function Icon({
 
   if (href) {
     return (
-      <a href={href} className={className}>
+      <Link href={href} className={className}>
         {iconContent}
-      </a>
+      </Link>
     );
   }
 

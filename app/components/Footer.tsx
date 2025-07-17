@@ -19,10 +19,26 @@ export default function Footer() {
 
         {/* Social Media Icons */}
         <div className="flex flex-wrap justify-center w-[75%] sm:w-full gap-12 mb-8">
-          <Icon name="Facebook" imagePath="/img/facebook.svg" href="#" />
-          <Icon name="Instagram" imagePath="/img/instagram.svg" href="#" />
-          <Icon name="Twitter" imagePath="/img/twitter.svg" href="#" />
-          <Icon name="Youtube" imagePath="/img/youtube.svg" href="#" />
+          <Icon
+            name="Facebook"
+            imagePath="/img/facebook.svg"
+            href="https://www.facebook.com/blackyouthproject/"
+          />
+          <Icon
+            name="Instagram"
+            imagePath="/img/instagram.svg"
+            href="https://www.instagram.com/blackyouthproject"
+          />
+          <Icon
+            name="Twitter"
+            imagePath="/img/twitter.svg"
+            href="https://x.com/BlackYouthProj"
+          />
+          <Icon
+            name="Youtube"
+            imagePath="/img/youtube.svg"
+            href="https://www.youtube.com/user/BlackYouthProject"
+          />
         </div>
 
         {/* Navigation Links */}
