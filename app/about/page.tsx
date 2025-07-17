@@ -26,15 +26,20 @@ export default function About() {
               >
                 Mission Statement
               </h3>
-              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                sed do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-                aute irure dolor in reprehenderit in voluptate velit esse cillum
-                dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                cupidatat non proident, sunt in culpa qui officia deserunt
-                mollit anim id est laborum.&quot;
+              <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+                The Black Youth Project will examine the attitudes, resources,
+                and culture of the young, urban black millennial, exploring how
+                these factors and others influence their decision-making, norms,
+                and behavior in critical domains such as sex, health, and
+                politics. Arguably more than any other subgroup of Americans,
+                African American youth reflect the challenges of inclusion and
+                empowerment in the post–civil rights period. At the core of this
+                project will be an exploration of what young black Americans
+                think about the political, cultural, and sexual choices and
+                challenges confronting them and their peer group. We are
+                especially interested in understanding what new factors help to
+                shape or contribute to the social and political attitudes and
+                behaviors of African American youth.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
@@ -42,18 +47,27 @@ export default function About() {
                 className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
-                Our History
+                Our Guiding Principles
               </h3>
-              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-                sed do eiusmod tempor incididunt ut labore et dolore magna
-                aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
-                aute irure dolor in reprehenderit in voluptate velit esse cillum
-                dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-                cupidatat non proident, sunt in culpa qui officia deserunt
-                mollit anim id est laborum.&quot;
-              </p>
+              <div>
+                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
+                  We are committed to producing research about the ideas,
+                  attitudes, decision making, and lived experiences of black
+                  youth, especially as it relates to their political and civic
+                  engagement.
+                </p>
+                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
+                  Unlike any other organization, we amplify the perspectives of
+                  young black people daily without censorship or control. We
+                  have built a space on the Internet where black youth can speak
+                  for themselves about the issues that concern them.
+                </p>
+                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
+                  Informed with culturally-specific knowledge, we will work to
+                  mobilize black youth and their allies to make positive change
+                  and build the world within which they want to live.
+                </p>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
               <h3
@@ -72,10 +86,10 @@ export default function About() {
                       width={400}
                       height={400}
                     />
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
                       {person.name}
                     </p>
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
+                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
                       {person.title}
                     </p>
                   </div>

@@ -1,5 +1,7 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Link from 'next/link';
+import EmailSubscribe from '../components/EmailSubscribe';
 
 export default function Contact() {
   return (
@@ -23,8 +25,16 @@ export default function Contact() {
                 Get in Touch
               </h3>
               <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                We&apos;d love to hear from you! Whether you have a question,
-                feedback, or just want to say hello, we&apos;re here to help.
+                If you have suggestions, comments, or questions about this
+                website and its contents, please feel free to contact us by
+                emailing{' '}
+                <Link
+                  className="underline hover:no-underline"
+                  href="mailto:info@blackyouthproject.com"
+                >
+                  info@blackyouthproject.com
+                </Link>
+                .
               </p>
             </div>
 
@@ -44,18 +54,12 @@ export default function Contact() {
                     Email
                   </h4>
                   <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    info@byp.com
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Phone
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    +1 (555) 123-4567
+                    <Link
+                      className="underline hover:no-underline"
+                      href="mailto:info@blackyouthproject.com"
+                    >
+                      info@blackyouthproject.com
+                    </Link>
                   </p>
                 </div>
                 <div>
@@ -65,47 +69,21 @@ export default function Contact() {
                   >
                     Address
                   </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    123 Main Street
-                    <br />
-                    City, State 12345
-                    <br />
-                    United States
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
+                  <p
+                    className="text-xl font-bold"
+                    style={{ fontFamily: 'Playfair' }}
                   >
-                    Business Hours
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Monday - Friday: 9:00 AM - 6:00 PM
+                    Black Youth Project
                     <br />
-                    Saturday: 10:00 AM - 4:00 PM
+                    University of Chicago
                     <br />
-                    Sunday: Closed
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
-              <h3
-                className="text-xl font-medium"
-                style={{ fontFamily: 'Gill Sans' }}
-              >
-                Contact Form
-              </h3>
-              <div className="bg-gray-100 rounded-lg p-6">
-                <p className="text-xl mb-4" style={{ fontFamily: 'Playfair' }}>
-                  Our contact form will be integrated here. This will allow
-                  users to send us messages directly through the website.
-                </p>
-                <div className="bg-white rounded p-4 border-2 border-dashed border-gray-300">
-                  <p className="text-sm text-gray-500 text-center">
-                    Contact form coming soon...
+                    Center for the Study of Race, Politics and Culture
+                    <br />
+                    <span className="font-normal">
+                      5733 South University Avenue
+                      <br />
+                      Chicago, IL 60637
+                    </span>
                   </p>
                 </div>
               </div>
@@ -121,19 +99,26 @@ export default function Contact() {
               <div className="space-y-4">
                 <div>
                   <h4
-                    className="text-lg font-medium mb-2"
+                    className="text-xl font-medium mb-2"
                     style={{ fontFamily: 'Gill Sans' }}
                   >
                     How can I submit content?
                   </h4>
                   <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Visit our Submissions page to learn more about how to
-                    contribute content to our platform.
+                    Visit our{' '}
+                    <Link
+                      className="underline hover:no-underline"
+                      href="/submissions"
+                    >
+                      Submissions
+                    </Link>{' '}
+                    page to learn more about how to contribute content to our
+                    platform.
                   </p>
                 </div>
                 <div>
                   <h4
-                    className="text-lg font-medium mb-2"
+                    className="text-xl font-medium mb-2"
                     style={{ fontFamily: 'Gill Sans' }}
                   >
                     What are your response times?
@@ -141,18 +126,6 @@ export default function Contact() {
                   <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                     We typically respond to inquiries within 24-48 hours during
                     business days.
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Do you offer support?
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Yes, we provide comprehensive support for all our users and
-                    partners.
                   </p>
                 </div>
               </div>

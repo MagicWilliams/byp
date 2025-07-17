@@ -79,9 +79,9 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
     >
       <h2
         className="text-2xl text-left mb-8"
-        style={{ fontFamily: 'Playfair Display', fontWeight: '800' }}
+        style={{ fontFamily: 'Playfair' }}
       >
-        NEWEST ARTICLES
+        Newest Articles
       </h2>
       <div className="flex overflow-x-auto space-x-8 pb-4">
         {postsLoading ? (

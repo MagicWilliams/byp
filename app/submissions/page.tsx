@@ -207,26 +207,6 @@ export default function Submissions() {
                 className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
-                Submission Form
-              </h3>
-              <div className="bg-gray-100 rounded-lg p-6">
-                <p className="text-xl mb-4" style={{ fontFamily: 'Playfair' }}>
-                  Our submission form will be integrated here. This will allow
-                  users to submit their content directly through the website.
-                </p>
-                <div className="bg-white rounded p-4 border-2 border-dashed border-gray-300">
-                  <p className="text-sm text-gray-500 text-center">
-                    Submission form coming soon...
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
-              <h3
-                className="text-xl font-medium"
-                style={{ fontFamily: 'Gill Sans' }}
-              >
                 Questions?
               </h3>
               <p className="text-xl" style={{ fontFamily: 'Playfair' }}>

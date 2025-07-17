@@ -31,3 +31,13 @@
   text-decoration: underline;
   color: #d90103;
 }
+
+.article video {
+  width: 100%;
+  height: auto;
+}
+
+.article iframe {
+  width: 100%;
+  margin-bottom: 2.5rem;
+}
