@@ -36,13 +36,13 @@ export default function BLEArticlePreview({
           </span>
         </div>
         {/* Content Section: 2 columns */}
-        <div className="flex-1 grid grid-cols-5 gap-4 items-start">
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-4 items-start">
           {/* Left: Title, byline, excerpt */}
-          <div className="col-span-3 flex flex-col justify-between">
+          <div className="lg:col-span-3 flex flex-col justify-between">
             <div>
               <div
                 className="text-xl text-black group-hover:text-gray-500 transition-colors"
-                style={{ fontFamily: 'Gill Sans' }}
+                style={{ fontFamily: 'Gill Sans', fontWeight: 500 }}
               >
                 {post.post_title}
               </div>
@@ -63,7 +63,7 @@ export default function BLEArticlePreview({
             </div>
           </div>
           {/* Right: 4:3 Image */}
-          <div className="col-span-2 flex items-center justify-end relative">
+          <div className="lg:col-span-2 flex items-center justify-end relative">
             {post.jetpack_featured_media_url && (
               <div className="w-full aspect-[4/3] overflow-hidden flex items-start justify-start relative">
                 <Image

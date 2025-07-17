@@ -25,7 +25,7 @@ export interface FeaturedPostProps {
 function FeaturedPostSkeleton() {
   return (
     <section className="relative text-white overflow-hidden">
-      <div className="relative h-[50vh] md:h-[75vh] m-4 md:m-8">
+      <div className="relative m-4 md:m-8">
         {/* Image skeleton */}
         <div className="w-full h-full bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-pulse rounded-md"></div>
       </div>
@@ -85,9 +85,9 @@ export default function FeaturedPost({
   };
 
   return (
-    <section className="relative text-white overflow-hidden">
+    <section className="relative text-white overflow-hidden max-w-7xl mx-auto">
       <Link href={`/article/${featuredPost.slug}`} className="block h-full">
-        <div className="relative h-[50vh] md:h-[75vh] m-4 md:m-8">
+        <div className="relative w-auto h-auto aspect-[16/9] m-4 md:m-8">
           {featuredPost.jetpack_featured_media_url && (
             <>
               <Image
@@ -134,20 +134,30 @@ export default function FeaturedPost({
                 )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                <h3
-                  className="text-4xl md:text-5xl font-black mt-2 w-full"
-                  style={{ fontFamily: 'Playfair Display' }}
-                  dangerouslySetInnerHTML={{
-                    __html: featuredPost.title.rendered,
-                  }}
-                />
-                <div
-                  className="text-lg sm:text-right"
-                  style={{ fontFamily: 'Playfair' }}
-                  dangerouslySetInnerHTML={{
-                    __html: featuredPost.excerpt.rendered,
-                  }}
-                />
+                <Link
+                  href={`/article/${featuredPost.slug}`}
+                  className="transition-opacity duration-200 hover:opacity-80"
+                >
+                  <h3
+                    className="text-4xl md:text-5xl font-black mt-2 w-full"
+                    style={{ fontFamily: 'Playfair Display' }}
+                    dangerouslySetInnerHTML={{
+                      __html: featuredPost.title.rendered,
+                    }}
+                  />
+                </Link>
+                <Link
+                  href={`/article/${featuredPost.slug}`}
+                  className="transition-opacity duration-200 hover:opacity-80"
+                >
+                  <div
+                    className="text-lg sm:text-right"
+                    style={{ fontFamily: 'Playfair' }}
+                    dangerouslySetInnerHTML={{
+                      __html: featuredPost.excerpt.rendered,
+                    }}
+                  />
+                </Link>
               </div>
             </div>
           </div>

@@ -23,11 +23,14 @@ export default function ArticlePreview({
   const excerptColor = isBle ? 'text-gray-700' : 'text-[#ddd]';
 
   return (
-    <div className="flex-shrink-0 w-80 w-full max-w-sm group">
-      <Link href={`/article/${post.slug}`}>
+    <div className="flex-shrink-0 w-80 w-full group">
+      <Link
+        href={`/article/${post.slug}`}
+        className="transition-opacity duration-200 hover:opacity-80"
+      >
         <div className="flex flex-col overflow-hidden">
           {post.jetpack_featured_media_url && (
-            <div className="relative w-full aspect-[4/3] mb-2">
+            <div className="relative w-full aspect-[16/9] mb-2">
               <Image
                 src={post.jetpack_featured_media_url}
                 alt={post.title.rendered}

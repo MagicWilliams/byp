@@ -19,7 +19,7 @@ function ArticlePreviewSkeleton({ isBle = false }: { isBle?: boolean }) {
     <div className="flex-shrink-0 w-80 w-full max-w-sm">
       <div className="flex flex-col overflow-hidden">
         {/* Image skeleton */}
-        <div className="relative w-full aspect-[4/3] mb-2">
+        <div className="relative w-full aspect-[16/9] mb-2">
           <div
             className={`w-full h-full bg-gradient-to-r ${bgColor} animate-pulse rounded-md`}
           ></div>
@@ -71,15 +71,15 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
 
   return (
     <section
-      className={`py-12 border-t-2 ${
+      className={`py-8 border-t-2 ${
         page === 'ble'
           ? 'bg-white text-black px-4 sm:px-6 lg:px-8 py-12'
           : 'border-white'
       }`}
     >
       <h2
-        className="text-2xl text-left mb-8"
-        style={{ fontFamily: 'Playfair' }}
+        className="text-2xl text-left mb-8 font-medium"
+        style={{ fontFamily: 'Gill Sans' }}
       >
         Newest Articles
       </h2>
@@ -93,15 +93,11 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
           <div>Error loading articles: {postsError}</div>
         ) : (
           // Show actual articles when loaded
-          posts
-            .slice(0, 5)
-            .map(post => (
-              <ArticlePreview
-                key={post.id}
-                post={post}
-                isBle={page === 'ble'}
-              />
-            ))
+          posts.slice(0, 5).map(post => (
+            <div className="w-[32%] max-w-sm flex-shrink-0" key={post.id}>
+              <ArticlePreview post={post} isBle={page === 'ble'} />
+            </div>
+          ))
         )}
       </div>
       <div className="flex justify-end">

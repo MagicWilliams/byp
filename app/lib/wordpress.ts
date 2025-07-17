@@ -107,6 +107,8 @@ export interface BLEIssue {
   featured_image_url: string | null;
   acf: {
     associated_posts: BLEAssociatedPost[];
+    gradientstart: string;
+    gradientend: string;
   };
 }
 
@@ -153,7 +155,12 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
                 const wpPostRes = await fetch(
                   `${WORDPRESS_API_URL}/posts/${post.ID}`
                 );
-                if (!wpPostRes.ok) throw new Error('Post fetch failed');
+                if (!wpPostRes.ok)
+                  throw new Error(
+                    `Post ${(post.ID, post.post_title)} fetch failed: ${
+                      wpPostRes.status
+                    }`
+                  );
                 const wpPost = await wpPostRes.json();
                 let authorDetails = null;
                 if (wpPost.author) {

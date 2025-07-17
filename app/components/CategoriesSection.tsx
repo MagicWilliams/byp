@@ -59,12 +59,12 @@ export default function CategoriesSection({
       <div className="flex flex-col md:flex-row gap-8">
         {/* Categories column */}
         <div className="w-full md:w-1/4 flex-shrink-0">
-          <div className=" rounded-lg md:p-6 mb-4 md:mb-0">
+          <div className="rounded-lg md:p-6 mb-4 md:mb-0 md:pt-0">
             <h3
               className="text-2xl font-medium mb-4 text-white"
               style={{ fontFamily: 'Gill Sans' }}
             >
-              CATEGORIES
+              Categories
             </h3>
             <ul className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-0">
               <li>
@@ -83,6 +83,7 @@ export default function CategoriesSection({
                 <li key={category.id}>
                   <button
                     onClick={() => setSelectedCategory(category.id)}
+                    style={{ fontFamily: 'Gill Sans' }}
                     className={`w-full text-left py-1 rounded transition-colors ${
                       selectedCategory === category.id
                         ? 'text-white font-bold'
