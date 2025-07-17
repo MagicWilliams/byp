@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
 import Image from 'next/image';
@@ -59,6 +59,10 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
     fetchPostsByCategoryName,
   } = useSiteStore();
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     // If page is "ble", fetch posts in the "blacklifeeverywhere" category
     if (page === 'ble') {
@@ -68,6 +72,41 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
       fetchPosts({ per_page: 5, page: 1 });
     }
   }, [fetchPosts, fetchPostsByCategoryName, page]);
+
+  const startScrolling = () => {
+    if (!scrollContainerRef.current) return;
+
+    setIsScrolling(true);
+    scrollIntervalRef.current = setInterval(() => {
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollLeft += 10; // Smooth scroll speed
+      }
+    }, 16); // ~60fps
+  };
+
+  const stopScrolling = () => {
+    setIsScrolling(false);
+    if (scrollIntervalRef.current) {
+      clearInterval(scrollIntervalRef.current);
+      scrollIntervalRef.current = null;
+    }
+  };
+
+  const handleArrowClick = () => {
+    if (!scrollContainerRef.current) return;
+
+    // Scroll by a fixed amount (e.g., 300px) when clicked
+    scrollContainerRef.current.scrollLeft += 300;
+  };
+
+  // Cleanup interval on unmount
+  useEffect(() => {
+    return () => {
+      if (scrollIntervalRef.current) {
+        clearInterval(scrollIntervalRef.current);
+      }
+    };
+  }, []);
 
   return (
     <section
@@ -83,7 +122,10 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
       >
         Newest Articles
       </h2>
-      <div className="flex overflow-x-auto space-x-8 pb-4">
+      <div
+        ref={scrollContainerRef}
+        className="flex overflow-x-auto space-x-8 pb-4 scroll-smooth"
+      >
         {postsLoading ? (
           // Show skeleton loaders while loading
           Array.from({ length: 5 }).map((_, index) => (
@@ -106,6 +148,12 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
           alt="Scroll to the right for additional articles."
           width={50}
           height={33}
+          className={`cursor-pointer transition-opacity duration-200 ${
+            isScrolling ? 'opacity-70' : 'opacity-100'
+          }`}
+          onMouseEnter={startScrolling}
+          onMouseLeave={stopScrolling}
+          onClick={handleArrowClick}
         />
       </div>
     </section>
