@@ -30,7 +30,7 @@ export default async function BlackLifeEverywhere() {
             )}
 
             {/* Content */}
-            <div className="relative z-10 p-8 max-w-7xl mx-auto">
+            <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto">
               <div className="flex flex-col lg:flex-row gap-8 items-stretch">
                 {/* Right Column (Image) - appears first on mobile */}
                 {bleIssues[0].featured_image_url && (
@@ -38,7 +38,7 @@ export default async function BlackLifeEverywhere() {
                     <Image
                       src={bleIssues[0].featured_image_url}
                       alt={bleIssues[0].title.rendered}
-                      className="shadow-lg object-cover w-full h-96 max-h-[28rem]"
+                      className="shadow-lg object-cover w-full h-auto"
                       width={1000}
                       height={1000}
                     />
@@ -53,7 +53,7 @@ export default async function BlackLifeEverywhere() {
                     Latest Edition
                   </span>
                   <h1
-                    className="text-3xl md:text-4xl font-bold mb-2"
+                    className="text-3xl md:text-4xl font-bold mb-2 text-white"
                     style={{
                       fontFamily:
                         'Gill Sans, GillSans, Gill Sans MT, Calibri, sans-serif',

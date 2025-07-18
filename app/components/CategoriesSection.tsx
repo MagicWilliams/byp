@@ -69,7 +69,7 @@ export default function CategoriesSection({
     : postsError;
 
   return (
-    <section className="py-4 md:py-12 border-t-2 border-white">
+    <section className="py-4 pt-8 md:pt-12md:py-12 border-t-2 border-white">
       <div className="flex flex-col md:flex-row gap-8">
         {/* Categories column */}
         <div className="w-full md:w-1/4 flex-shrink-0">
@@ -80,7 +80,10 @@ export default function CategoriesSection({
             >
               Categories
             </h3>
-            <ul className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-0">
+            <ul
+              style={{ alignItems: 'first baseline' }}
+              className="flex md:flex-col flex-row flex-wrap gap-2 md:gap-0"
+            >
               <li>
                 <button
                   onClick={() => setSelectedCategory(null)}

@@ -21,6 +21,7 @@ export default function ArticlePreview({
   isBle = false,
 }: ArticlePreviewProps) {
   const excerptColor = isBle ? 'text-gray-700' : 'text-[#ddd]';
+  const titleColor = isBle ? 'text-black' : 'text-white';
 
   return (
     <div className="flex-shrink-0 w-80 w-full group">
@@ -43,7 +44,7 @@ export default function ArticlePreview({
           )}
           <div className="">
             <h3
-              className="font-medium text-xl mb-2 text-white"
+              className={`font-medium text-xl my-2 ${titleColor}`}
               style={{ fontFamily: 'Gill Sans' }}
               dangerouslySetInnerHTML={{ __html: post.title.rendered }}
             />

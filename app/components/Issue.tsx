@@ -87,7 +87,7 @@ const Issue: React.FC<IssueProps> = ({ issue, index, collapsed, onToggle }) => {
       {/* Collapsible Section */}
       <div
         className={`transition-all duration-500 overflow-hidden ${
-          collapsed ? 'max-h-0 opacity-0' : 'max-h-[5000px] opacity-100'
+          collapsed ? 'max-h-0 opacity-0' : 'opacity-100'
         }`}
         style={{ transitionProperty: 'max-height, opacity' }}
       >

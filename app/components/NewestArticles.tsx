@@ -111,7 +111,9 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
       }`}
     >
       <h2
-        className="text-2xl text-left mb-8 font-medium"
+        className={`text-2xl text-left mb-8 font-medium ${
+          page === 'ble' ? 'text-black' : 'text-white'
+        }`}
         style={{ fontFamily: 'Gill Sans' }}
       >
         Newest Articles
@@ -141,7 +143,7 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
       </div>
       <div className="flex justify-end">
         <Image
-          src="/img/arrow.svg"
+          src={page === 'ble' ? '/img/arrow-black.svg' : '/img/arrow.svg'}
           alt="Scroll to the right for additional articles."
           width={50}
           height={33}
