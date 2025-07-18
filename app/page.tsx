@@ -7,7 +7,7 @@ import NewestArticles from './components/NewestArticles';
 import CategoriesSection from './components/CategoriesSection';
 import FeaturedPost from './components/FeaturedPost';
 import { useSiteStore } from './lib/store';
-import { PageResults, WordPressPost } from './lib/wordpress';
+import { WordPressCategory, WordPressPost } from './lib/wordpress';
 
 export default function Home() {
   const { posts, postsLoading, categories, fetchPosts, fetchCategories } =
@@ -16,11 +16,19 @@ export default function Home() {
   useEffect(() => {
     // Fetch data only if we don't have it or if it's stale
     // The store will automatically check cache and only fetch if needed
-    fetchPosts({ per_page: 100, _embed: true } as unknown as PageResults);
+    fetchPosts();
     fetchCategories();
   }, [fetchPosts, fetchCategories]);
 
-  const featuredPost = posts[0] as WordPressPost | undefined;
+  const featuredCategory = categories.find(
+    category => category.name === 'Featured'
+  ) as WordPressCategory | undefined;
+
+  const featuredPosts = posts.filter(post =>
+    post.categories.includes(featuredCategory?.id || 0)
+  ) as WordPressPost[] | undefined;
+
+  const featuredPost = featuredPosts?.[0] as WordPressPost | undefined;
 
   return (
     <div

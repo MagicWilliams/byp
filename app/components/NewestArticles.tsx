@@ -51,13 +51,8 @@ function ArticlePreviewSkeleton({ isBle = false }: { isBle?: boolean }) {
 }
 
 export default function NewestArticles({ page }: NewestArticlesProps) {
-  const {
-    posts,
-    postsLoading,
-    postsError,
-    fetchPosts,
-    fetchPostsByCategoryName,
-  } = useSiteStore();
+  const { posts, postsLoading, postsError, fetchPostsByCategoryName } =
+    useSiteStore();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -67,11 +62,10 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
     // If page is "ble", fetch posts in the "blacklifeeverywhere" category
     if (page === 'ble') {
       fetchPostsByCategoryName('blacklifeeverywhere', { per_page: 5, page: 1 });
-    } else {
-      // Standard behavior - fetch all posts
-      fetchPosts({ per_page: 5, page: 1 });
     }
-  }, [fetchPosts, fetchPostsByCategoryName, page]);
+    // For standard behavior, we don't need to fetch posts here
+    // The main page already fetches all posts, and we'll slice them on the frontend
+  }, [fetchPostsByCategoryName, page]);
 
   const startScrolling = () => {
     if (!scrollContainerRef.current) return;

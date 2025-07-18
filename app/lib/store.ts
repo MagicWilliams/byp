@@ -147,6 +147,11 @@ interface SiteState {
   totalIssues: number;
   totalPosts: number;
 
+  // Category-specific posts storage
+  categoryPosts: Record<number, WordPressPost[]>;
+  categoryPostsLoading: Record<number, boolean>;
+  categoryPostsError: Record<number, string | null>;
+
   postsLoading: boolean;
   categoriesLoading: boolean;
   tagsLoading: boolean;
@@ -166,6 +171,9 @@ interface SiteState {
   bleIssuesLastFetched: number | null;
   bleTagsLastFetched: number | null;
 
+  // Cache key for posts to handle different parameter combinations
+  postsCacheKey: string | null;
+
   fetchPosts: (params?: {
     per_page?: number;
     page?: number;
@@ -174,6 +182,15 @@ interface SiteState {
     search?: string;
     force?: boolean;
   }) => Promise<void>;
+
+  fetchPostsByCategoryId: (
+    categoryId: number,
+    params?: {
+      per_page?: number;
+      page?: number;
+      force?: boolean;
+    }
+  ) => Promise<void>;
 
   fetchPostsByTagName: (
     tagName: string,
@@ -220,6 +237,7 @@ interface SiteState {
   clearIssues: () => void;
   clearErrors: () => void;
   clearCache: () => void;
+  clearCategoryPosts: (categoryId?: number) => void;
 }
 
 // Cache duration in milliseconds (5 minutes)
@@ -243,6 +261,11 @@ export const useSiteStore = create<SiteState>()(
       totalIssues: 0,
       totalPosts: 0,
 
+      // Category-specific posts storage
+      categoryPosts: {},
+      categoryPostsLoading: {},
+      categoryPostsError: {},
+
       postsLoading: false,
       categoriesLoading: false,
       tagsLoading: false,
@@ -262,27 +285,45 @@ export const useSiteStore = create<SiteState>()(
       bleIssuesLastFetched: null,
       bleTagsLastFetched: null,
 
+      // Cache key for posts to handle different parameter combinations
+      postsCacheKey: null,
+
       fetchPosts: async (params = {}) => {
         const { force = false, ...fetchParams } = params;
         const state = get();
 
-        // Check if we have cached data and it's not stale
+        // Standardize parameters to always fetch 100 posts with _embed
+        const standardizedParams = {
+          per_page: 100,
+          _embed: true,
+          ...fetchParams,
+        };
+
+        // Create cache key based on parameters
+        const cacheKey = JSON.stringify(standardizedParams);
+
+        // Check if we have cached data for these exact parameters and it's not stale
         if (
           !force &&
           state.posts.length > 0 &&
+          state.postsCacheKey === cacheKey &&
           !isDataStale(state.postsLastFetched)
         ) {
+          console.log('Using cached posts data');
           return; // Use cached data
         }
+
+        console.log('Fetching posts with parameters:', standardizedParams);
 
         set({ postsLoading: true, postsError: null });
 
         try {
-          const posts = await fetchPosts(fetchParams);
+          const posts = await fetchPosts(standardizedParams);
           set({
             posts,
             postsLoading: false,
             postsLastFetched: Date.now(),
+            postsCacheKey: cacheKey,
           });
         } catch (error) {
           set({
@@ -321,6 +362,80 @@ export const useSiteStore = create<SiteState>()(
               error instanceof Error ? error.message : 'Failed to fetch posts',
             postsLoading: false,
           });
+        }
+      },
+
+      fetchPostsByCategoryId: async (categoryId, params = {}) => {
+        const { force = false, ...fetchParams } = params;
+        const state = get();
+
+        // Standardize parameters to fetch 10 posts with _embed
+        const standardizedParams = {
+          per_page: 10,
+          _embed: true,
+          categories: [categoryId],
+          orderby: 'date',
+          order: 'desc',
+          ...fetchParams,
+        };
+
+        // Check if we have cached data for this category and it's not stale
+        const categoryPosts = state.categoryPosts[categoryId] || [];
+        const categoryPostsLastFetched = state.postsLastFetched; // Using posts timestamp for now
+
+        if (
+          !force &&
+          categoryPosts.length > 0 &&
+          !isDataStale(categoryPostsLastFetched)
+        ) {
+          console.log(`Using cached posts for category ${categoryId}`);
+          return; // Use cached data
+        }
+
+        console.log(
+          `Fetching posts for category ${categoryId} with parameters:`,
+          standardizedParams
+        );
+
+        // Set loading state for this specific category
+        set(state => ({
+          categoryPostsLoading: {
+            ...state.categoryPostsLoading,
+            [categoryId]: true,
+          },
+          categoryPostsError: {
+            ...state.categoryPostsError,
+            [categoryId]: null,
+          },
+        }));
+
+        try {
+          const posts = await fetchPosts(standardizedParams);
+          set(state => ({
+            categoryPosts: {
+              ...state.categoryPosts,
+              [categoryId]: posts,
+            },
+            categoryPostsLoading: {
+              ...state.categoryPostsLoading,
+              [categoryId]: false,
+            },
+            postsLastFetched: Date.now(),
+          }));
+        } catch (error) {
+          set(state => ({
+            categoryPostsError: {
+              ...state.categoryPostsError,
+              [categoryId]:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to fetch posts',
+            },
+            categoryPostsLoading: {
+              ...state.categoryPostsLoading,
+              [categoryId]: false,
+            },
+          }));
         }
       },
 
@@ -500,6 +615,7 @@ export const useSiteStore = create<SiteState>()(
           posts: [],
           postsError: null,
           postsLastFetched: null,
+          postsCacheKey: null,
         }),
       clearCategories: () =>
         set({
@@ -528,9 +644,37 @@ export const useSiteStore = create<SiteState>()(
           bleIssuesError: null,
           bleTagsError: null,
         }),
+      clearCategoryPosts: (categoryId?: number) => {
+        if (categoryId) {
+          // Clear specific category posts
+          set(state => ({
+            categoryPosts: {
+              ...state.categoryPosts,
+              [categoryId]: [],
+            },
+            categoryPostsLoading: {
+              ...state.categoryPostsLoading,
+              [categoryId]: false,
+            },
+            categoryPostsError: {
+              ...state.categoryPostsError,
+              [categoryId]: null,
+            },
+          }));
+        } else {
+          // Clear all category posts
+          set({
+            categoryPosts: {},
+            categoryPostsLoading: {},
+            categoryPostsError: {},
+          });
+        }
+      },
+
       clearCache: () =>
         set({
           postsLastFetched: null,
+          postsCacheKey: null,
           categoriesLastFetched: null,
           tagsLastFetched: null,
           bleIssuesLastFetched: null,
@@ -550,7 +694,9 @@ export const useSiteStore = create<SiteState>()(
         bleTags: state.bleTags,
         totalIssues: state.totalIssues,
         totalPosts: state.totalPosts,
+        categoryPosts: state.categoryPosts,
         postsLastFetched: state.postsLastFetched,
+        postsCacheKey: state.postsCacheKey,
         categoriesLastFetched: state.categoriesLastFetched,
         tagsLastFetched: state.tagsLastFetched,
         bleIssuesLastFetched: state.bleIssuesLastFetched,

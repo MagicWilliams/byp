@@ -55,7 +55,6 @@ const Issue: React.FC<IssueProps> = ({ issue, index, collapsed, onToggle }) => {
   const { gradientstart, gradientend } = issue.acf;
   const gradient = `linear-gradient(to right, ${gradientstart}, ${gradientend})`;
   const brighterBackground = makeColorBrighter(gradientstart);
-  console.log(brighterBackground, gradientstart);
 
   return (
     <div

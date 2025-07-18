@@ -1,14 +1,8 @@
-import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import Link from 'next/link';
 
 export default function GetInvolved() {
-  const exampleTeam = [
-    { name: 'John Doe', title: 'CEO', image: '/img/person.png' },
-    { name: 'Jane Doe', title: 'CTO', image: '/img/person.png' },
-    { name: 'Jim Doe', title: 'CFO', image: '/img/person.png' },
-  ];
   return (
     <div className="min-h-screen bg-white w-full">
       <Header />

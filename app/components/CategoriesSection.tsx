@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
-import { WordPressCategory, PageResults } from '../lib/wordpress';
+import { WordPressCategory } from '../lib/wordpress';
 
 // Skeleton component for article previews in grid layout
 function ArticlePreviewSkeleton() {
@@ -35,24 +35,38 @@ export default function CategoriesSection({
 }: {
   categories: WordPressCategory[];
 }) {
-  const { posts, postsLoading, postsError, fetchPosts } = useSiteStore();
+  const {
+    posts,
+    postsLoading,
+    postsError,
+    categoryPosts,
+    categoryPostsLoading,
+    categoryPostsError,
+    fetchPostsByCategoryId,
+  } = useSiteStore();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
 
   useEffect(() => {
-    // Fetch a larger number of posts to get a good variety of categories
-    fetchPosts({
-      per_page: 100,
-      page: 1,
-      _embed: true,
-    } as unknown as PageResults);
-  }, [fetchPosts]);
+    // Fetch posts when a category is selected
+    if (selectedCategory) {
+      fetchPostsByCategoryId(selectedCategory);
+    }
+  }, [selectedCategory, fetchPostsByCategoryId]);
 
   const filteredPosts = useMemo(() => {
     if (!selectedCategory) {
       return posts;
     }
-    return posts.filter(post => post.categories.includes(selectedCategory));
-  }, [posts, selectedCategory]);
+    return categoryPosts[selectedCategory] || [];
+  }, [posts, selectedCategory, categoryPosts]);
+
+  const isLoading = selectedCategory
+    ? categoryPostsLoading[selectedCategory] || false
+    : postsLoading;
+
+  const error = selectedCategory
+    ? categoryPostsError[selectedCategory] || null
+    : postsError;
 
   return (
     <section className="py-4 md:py-12 border-t-2 border-white">
@@ -100,13 +114,13 @@ export default function CategoriesSection({
         {/* Articles grid */}
         <div className="w-full md:w-3/4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16">
-            {postsLoading ? (
+            {isLoading ? (
               // Show skeleton loaders while loading
               Array.from({ length: 9 }).map((_, index) => (
                 <ArticlePreviewSkeleton key={index} />
               ))
-            ) : postsError ? (
-              <div>Error loading posts for categories: {postsError}</div>
+            ) : error ? (
+              <div>Error loading posts for categories: {error}</div>
             ) : (
               // Show actual articles when loaded
               filteredPosts.map((post, index) => {
