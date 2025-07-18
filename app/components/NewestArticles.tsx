@@ -130,7 +130,10 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
         ) : (
           // Show actual articles when loaded
           posts.slice(0, 5).map(post => (
-            <div className="w-[32%] max-w-sm flex-shrink-0" key={post.id}>
+            <div
+              className="w-[66%] md:w-[32%] max-w-sm flex-shrink-0"
+              key={post.id}
+            >
               <ArticlePreview post={post} isBle={page === 'ble'} />
             </div>
           ))

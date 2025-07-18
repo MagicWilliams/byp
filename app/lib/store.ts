@@ -423,6 +423,10 @@ export const useSiteStore = create<SiteState>()(
             postsLastFetched: Date.now(),
           }));
         } catch (error) {
+          console.error(
+            `Error fetching posts for category ${categoryId}:`,
+            error
+          );
           set(state => ({
             categoryPostsError: {
               ...state.categoryPostsError,
@@ -683,8 +687,42 @@ export const useSiteStore = create<SiteState>()(
     }),
     {
       name: 'byp-store', // unique name for localStorage key
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => ({
+        getItem: (name: string) => {
+          try {
+            return localStorage.getItem(name);
+          } catch (error) {
+            console.warn('Failed to read from localStorage:', error);
+            return null;
+          }
+        },
+        setItem: (name: string, value: string) => {
+          try {
+            localStorage.setItem(name, value);
+          } catch (error) {
+            console.warn(
+              'Failed to write to localStorage (quota exceeded):',
+              error
+            );
+            // Clear some data to make space
+            try {
+              localStorage.clear();
+              localStorage.setItem(name, value);
+            } catch (clearError) {
+              console.error('Failed to clear localStorage:', clearError);
+            }
+          }
+        },
+        removeItem: (name: string) => {
+          try {
+            localStorage.removeItem(name);
+          } catch (error) {
+            console.warn('Failed to remove from localStorage:', error);
+          }
+        },
+      })),
       // Only persist data, not loading states or errors
+      // Note: categoryPosts is not persisted to avoid localStorage quota issues
       partialize: state => ({
         posts: state.posts,
         categories: state.categories,
@@ -694,7 +732,6 @@ export const useSiteStore = create<SiteState>()(
         bleTags: state.bleTags,
         totalIssues: state.totalIssues,
         totalPosts: state.totalPosts,
-        categoryPosts: state.categoryPosts,
         postsLastFetched: state.postsLastFetched,
         postsCacheKey: state.postsCacheKey,
         categoriesLastFetched: state.categoriesLastFetched,

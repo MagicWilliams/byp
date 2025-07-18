@@ -43,7 +43,7 @@ export default function ArticlePreview({
           )}
           <div className="">
             <h3
-              className="font-medium text-xl mb-2"
+              className="font-medium text-xl mb-2 text-white"
               style={{ fontFamily: 'Gill Sans' }}
               dangerouslySetInnerHTML={{ __html: post.title.rendered }}
             />
