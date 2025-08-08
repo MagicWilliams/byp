@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'blackyouthproject.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'secure.gravatar.com',
+      },
     ],
   },
 };

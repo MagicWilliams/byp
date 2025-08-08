@@ -4,8 +4,10 @@ import {
   WordPressPost,
   WordPressCategory,
   WordPressTag,
+  WordPressUser,
   BLEIssue,
   fetchBlackLifeEverywhereIssues,
+  fetchPostsByAuthor,
 } from './wordpress';
 
 export type IssueMapItem = {
@@ -137,10 +139,30 @@ async function fetchTags(): Promise<WordPressTag[]> {
   return await res.json();
 }
 
+async function fetchAuthors(): Promise<WordPressUser[]> {
+  const res = await fetch('/api/authors');
+  if (!res.ok) throw new Error('Failed to fetch authors');
+  return await res.json();
+}
+
+async function fetchAuthorByUsername(
+  username: string
+): Promise<WordPressUser | null> {
+  const res = await fetch(
+    `/api/authors?username=${encodeURIComponent(username)}`
+  );
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new Error('Failed to fetch author');
+  }
+  return await res.json();
+}
+
 interface SiteState {
   posts: WordPressPost[];
   categories: WordPressCategory[];
   tags: WordPressTag[];
+  authors: WordPressUser[];
   issues: BLEIssue[];
   bleIssues: BLEIssue[];
   bleTags: WordPressTag[];
@@ -152,15 +174,22 @@ interface SiteState {
   categoryPostsLoading: Record<number, boolean>;
   categoryPostsError: Record<number, string | null>;
 
+  // Author-specific posts storage
+  authorPosts: Record<string, WordPressPost[]>;
+  authorPostsLoading: Record<string, boolean>;
+  authorPostsError: Record<string, string | null>;
+
   postsLoading: boolean;
   categoriesLoading: boolean;
   tagsLoading: boolean;
+  authorsLoading: boolean;
   bleIssuesLoading: boolean;
   bleTagsLoading: boolean;
 
   postsError: string | null;
   categoriesError: string | null;
   tagsError: string | null;
+  authorsError: string | null;
   bleIssuesError: string | null;
   bleTagsError: string | null;
 
@@ -168,6 +197,7 @@ interface SiteState {
   postsLastFetched: number | null;
   categoriesLastFetched: number | null;
   tagsLastFetched: number | null;
+  authorsLastFetched: number | null;
   bleIssuesLastFetched: number | null;
   bleTagsLastFetched: number | null;
 
@@ -210,8 +240,22 @@ interface SiteState {
     }
   ) => Promise<void>;
 
+  fetchPostsByAuthor: (
+    username: string,
+    params?: {
+      per_page?: number;
+      page?: number;
+      force?: boolean;
+    }
+  ) => Promise<void>;
+
   fetchCategories: (force?: boolean) => Promise<void>;
   fetchTags: (force?: boolean) => Promise<void>;
+  fetchAuthors: (force?: boolean) => Promise<void>;
+  fetchAuthorByUsername: (
+    username: string,
+    force?: boolean
+  ) => Promise<WordPressUser | null>;
   fetchBlackLifeEverywhereIssues: (force?: boolean) => Promise<void>;
   fetchBLETags: (force?: boolean) => Promise<void>;
 
@@ -222,6 +266,7 @@ interface SiteState {
         | 'posts'
         | 'categories'
         | 'tags'
+        | 'authors'
         | 'issues'
         | 'bleIssues'
         | 'bleTags'
@@ -234,10 +279,12 @@ interface SiteState {
   clearPosts: () => void;
   clearCategories: () => void;
   clearTags: () => void;
+  clearAuthors: () => void;
   clearIssues: () => void;
   clearErrors: () => void;
   clearCache: () => void;
   clearCategoryPosts: (categoryId?: number) => void;
+  clearAuthorPosts: (username?: string) => void;
 }
 
 // Cache duration in milliseconds (5 minutes)
@@ -255,6 +302,7 @@ export const useSiteStore = create<SiteState>()(
       posts: [],
       categories: [],
       tags: [],
+      authors: [],
       issues: [],
       bleIssues: [],
       bleTags: [],
@@ -266,15 +314,22 @@ export const useSiteStore = create<SiteState>()(
       categoryPostsLoading: {},
       categoryPostsError: {},
 
+      // Author-specific posts storage
+      authorPosts: {},
+      authorPostsLoading: {},
+      authorPostsError: {},
+
       postsLoading: false,
       categoriesLoading: false,
       tagsLoading: false,
+      authorsLoading: false,
       bleIssuesLoading: false,
       bleTagsLoading: false,
 
       postsError: null,
       categoriesError: null,
       tagsError: null,
+      authorsError: null,
       bleIssuesError: null,
       bleTagsError: null,
 
@@ -282,6 +337,7 @@ export const useSiteStore = create<SiteState>()(
       postsLastFetched: null,
       categoriesLastFetched: null,
       tagsLastFetched: null,
+      authorsLastFetched: null,
       bleIssuesLastFetched: null,
       bleTagsLastFetched: null,
 
@@ -477,6 +533,109 @@ export const useSiteStore = create<SiteState>()(
         }
       },
 
+      fetchAuthors: async (force = false) => {
+        console.log('fetching authors');
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.authors.length > 0 &&
+          !isDataStale(state.authorsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ authorsLoading: true, authorsError: null });
+
+        try {
+          const authors = await fetchAuthors();
+          set({
+            authors,
+            authorsLoading: false,
+            authorsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          console.log('error', error);
+          set({
+            authorsError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch authors',
+            authorsLoading: false,
+          });
+        }
+      },
+
+      fetchAuthorByUsername: async (username, force = false) => {
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.authors.length > 0 &&
+          !isDataStale(state.authorsLastFetched)
+        ) {
+          // Return the author from cache if found
+          const cachedAuthor = state.authors.find(
+            author => author.username === username
+          );
+          return cachedAuthor || null;
+        }
+
+        set({ authorsLoading: true, authorsError: null });
+
+        try {
+          const author = await fetchAuthorByUsername(username);
+          set({
+            authors: author ? [author] : [],
+            authorsLoading: false,
+            authorsLastFetched: Date.now(),
+          });
+          return author;
+        } catch (error) {
+          set({
+            authorsError:
+              error instanceof Error ? error.message : 'Failed to fetch author',
+            authorsLoading: false,
+          });
+          return null;
+        }
+      },
+
+      fetchPostsByAuthor: async (username, params = {}) => {
+        const { force = false, ...fetchParams } = params;
+        const state = get();
+
+        // Check if we have cached data and it's not stale
+        if (
+          !force &&
+          state.posts.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return; // Use cached data
+        }
+
+        set({ postsLoading: true, postsError: null });
+
+        try {
+          const posts = await fetchPostsByAuthor(username, fetchParams);
+          set({
+            posts,
+            postsLoading: false,
+            postsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            postsError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch posts by author',
+            postsLoading: false,
+          });
+        }
+      },
+
       fetchCategories: async (force = false) => {
         const state = get();
 
@@ -606,6 +765,7 @@ export const useSiteStore = create<SiteState>()(
           posts: data.posts ?? state.posts,
           categories: data.categories ?? state.categories,
           tags: data.tags ?? state.tags,
+          authors: data.authors ?? state.authors,
           issues: data.issues ?? state.issues,
           bleIssues: data.bleIssues ?? state.bleIssues,
           bleTags: data.bleTags ?? state.bleTags,
@@ -633,6 +793,12 @@ export const useSiteStore = create<SiteState>()(
           tagsError: null,
           tagsLastFetched: null,
         }),
+      clearAuthors: () =>
+        set({
+          authors: [],
+          authorsError: null,
+          authorsLastFetched: null,
+        }),
       clearIssues: () =>
         set({
           issues: [],
@@ -645,6 +811,7 @@ export const useSiteStore = create<SiteState>()(
           postsError: null,
           categoriesError: null,
           tagsError: null,
+          authorsError: null,
           bleIssuesError: null,
           bleTagsError: null,
         }),
@@ -674,6 +841,32 @@ export const useSiteStore = create<SiteState>()(
           });
         }
       },
+      clearAuthorPosts: (username?: string) => {
+        if (username) {
+          // Clear specific author posts
+          set(state => ({
+            authorPosts: {
+              ...state.authorPosts,
+              [username]: [],
+            },
+            authorPostsLoading: {
+              ...state.authorPostsLoading,
+              [username]: false,
+            },
+            authorPostsError: {
+              ...state.authorPostsError,
+              [username]: null,
+            },
+          }));
+        } else {
+          // Clear all author posts
+          set({
+            authorPosts: {},
+            authorPostsLoading: {},
+            authorPostsError: {},
+          });
+        }
+      },
 
       clearCache: () =>
         set({
@@ -681,52 +874,62 @@ export const useSiteStore = create<SiteState>()(
           postsCacheKey: null,
           categoriesLastFetched: null,
           tagsLastFetched: null,
+          authorsLastFetched: null,
           bleIssuesLastFetched: null,
           bleTagsLastFetched: null,
         }),
     }),
     {
       name: 'byp-store', // unique name for localStorage key
-      storage: createJSONStorage(() => ({
-        getItem: (name: string) => {
-          try {
-            return localStorage.getItem(name);
-          } catch (error) {
-            console.warn('Failed to read from localStorage:', error);
-            return null;
-          }
-        },
-        setItem: (name: string, value: string) => {
-          try {
-            localStorage.setItem(name, value);
-          } catch (error) {
-            console.warn(
-              'Failed to write to localStorage (quota exceeded):',
-              error
-            );
-            // Clear some data to make space
+      storage: createJSONStorage(() => {
+        // Check if we're in a browser environment
+        const isClient = typeof window !== 'undefined';
+
+        return {
+          getItem: (name: string) => {
+            if (!isClient) return null;
             try {
-              localStorage.clear();
-              localStorage.setItem(name, value);
-            } catch (clearError) {
-              console.error('Failed to clear localStorage:', clearError);
+              return localStorage.getItem(name);
+            } catch (error) {
+              console.warn('Failed to read from localStorage:', error);
+              return null;
             }
-          }
-        },
-        removeItem: (name: string) => {
-          try {
-            localStorage.removeItem(name);
-          } catch (error) {
-            console.warn('Failed to remove from localStorage:', error);
-          }
-        },
-      })),
+          },
+          setItem: (name: string, value: string) => {
+            if (!isClient) return;
+            try {
+              localStorage.setItem(name, value);
+            } catch (error) {
+              console.warn(
+                'Failed to write to localStorage (quota exceeded):',
+                error
+              );
+              // Clear some data to make space
+              try {
+                localStorage.clear();
+                localStorage.setItem(name, value);
+              } catch (clearError) {
+                console.error('Failed to clear localStorage:', clearError);
+              }
+            }
+          },
+          removeItem: (name: string) => {
+            if (!isClient) return;
+            try {
+              localStorage.removeItem(name);
+            } catch (error) {
+              console.warn('Failed to remove from localStorage:', error);
+            }
+          },
+        };
+      }),
       // Only persist data, not loading states or errors
       // Note: categoryPosts is not persisted to avoid localStorage quota issues
       partialize: state => ({
         posts: state.posts,
         categories: state.categories,
         tags: state.tags,
+        authors: state.authors,
         issues: state.issues,
         bleIssues: state.bleIssues,
         bleTags: state.bleTags,
@@ -736,6 +939,7 @@ export const useSiteStore = create<SiteState>()(
         postsCacheKey: state.postsCacheKey,
         categoriesLastFetched: state.categoriesLastFetched,
         tagsLastFetched: state.tagsLastFetched,
+        authorsLastFetched: state.authorsLastFetched,
         bleIssuesLastFetched: state.bleIssuesLastFetched,
         bleTagsLastFetched: state.bleTagsLastFetched,
       }),

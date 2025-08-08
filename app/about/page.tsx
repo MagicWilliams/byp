@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 export default function About() {
@@ -6,77 +7,57 @@ export default function About() {
     { name: 'John Doe', title: 'CEO', image: '/img/person.png' },
     { name: 'Jane Doe', title: 'CTO', image: '/img/person.png' },
     { name: 'Jim Doe', title: 'CFO', image: '/img/person.png' },
+    { name: 'Janet Doe', title: 'CEO', image: '/img/person.png' },
+    { name: 'Jamie Doe', title: 'CTO', image: '/img/person.png' },
+    { name: 'Jill Doe', title: 'CFO', image: '/img/person.png' },
   ];
   return (
-    <div className="min-h-screen bg-white w-full">
+    <div className="min-h-screen bg-[#111] w-full">
       <Header />
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg">
-          <section className="mb-8 text-black flex flex-col gap-8">
+        <div className="bg-[#111] rounded-lg">
+          <section className="mb-8 text-white flex flex-col gap-8">
             <h1
-              className="text-3xl font-medium mb-8 py-8"
-              style={{ fontFamily: 'Gill Sans' }}
+              className="text-3xl font-medium py-8 text-center"
+              style={{ fontFamily: 'Playfair Display' }}
             >
               About Us
             </h1>
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4  mb-8">
-              <h3
-                className="text-xl font-medium"
-                style={{ fontFamily: 'Gill Sans' }}
-              >
-                Mission Statement
-              </h3>
-              <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
-                The Black Youth Project will examine the attitudes, resources,
-                and culture of the young, urban black millennial, exploring how
-                these factors and others influence their decision-making, norms,
-                and behavior in critical domains such as sex, health, and
-                politics. Arguably more than any other subgroup of Americans,
-                African American youth reflect the challenges of inclusion and
-                empowerment in the post–civil rights period. At the core of this
-                project will be an exploration of what young black Americans
-                think about the political, cultural, and sexual choices and
-                challenges confronting them and their peer group. We are
-                especially interested in understanding what new factors help to
-                shape or contribute to the social and political attitudes and
-                behaviors of African American youth.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
-              <h3
-                className="text-xl font-medium"
-                style={{ fontFamily: 'Gill Sans' }}
-              >
-                Our Guiding Principles
-              </h3>
-              <div>
-                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
-                  We are committed to producing research about the ideas,
-                  attitudes, decision making, and lived experiences of black
-                  youth, especially as it relates to their political and civic
-                  engagement.
-                </p>
-                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
-                  Unlike any other organization, we amplify the perspectives of
-                  young black people daily without censorship or control. We
-                  have built a space on the Internet where black youth can speak
-                  for themselves about the issues that concern them.
-                </p>
-                <p className="text-lg mb-4" style={{ fontFamily: 'Playfair' }}>
-                  Informed with culturally-specific knowledge, we will work to
-                  mobilize black youth and their allies to make positive change
-                  and build the world within which they want to live.
+            <h3 className="w-[90%] mx-auto max-w-7xl text-[2rem] mb-8 text-center text-white">
+              The Black Youth Project will examine the attitudes, resources, and
+              culture of the young, urban black millennial, exploring how these
+              factors and others influence their decision-making, norms, and
+              behavior in critical domains such as sex, health, and politics.
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:border-r sm:border-gray-600 sm:pr-4">
+                <p
+                  className="text-lg text-white"
+                  style={{ fontFamily: 'Playfair' }}
+                >
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
+                  irure dolor in reprehenderit in voluptate velit esse cillum
+                  dolore eu fugiat nulla pariatur.
                 </p>
               </div>
+              <div className="w-full h-full flex justify-center items-center sm:pl-4">
+                <Image
+                  src="/img/community.png"
+                  alt="Black Youth Project"
+                  width={500}
+                  height={500}
+                />
+              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
-              <h3
-                className="text-xl font-medium"
-                style={{ fontFamily: 'Gill Sans' }}
-              >
+            <div className="flex flex-col gap-8 mb-12">
+              <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
                 Our Team
               </h3>
-              <div className="grid grid-cols-2 gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
                 {exampleTeam.map(person => (
                   <div key={person.name}>
                     <Image
@@ -86,14 +67,81 @@ export default function About() {
                       width={400}
                       height={400}
                     />
-                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+                    <p
+                      className="text-lg text-white"
+                      style={{ fontFamily: 'Playfair' }}
+                    >
                       {person.name}
                     </p>
-                    <p className="text-lg" style={{ fontFamily: 'Playfair' }}>
+                    <p
+                      className="text-lg text-white"
+                      style={{ fontFamily: 'Playfair' }}
+                    >
                       {person.title}
                     </p>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-8">
+              <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
+                Our Programs
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4">
+                  <h4
+                    className="text-[1.5rem] font-medium"
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    The Black Youth Project
+                  </h4>
+                  <p
+                    className="text-lg text-white"
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </p>
+                  <p
+                    className="text-lg text-white"
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h4
+                    className="text-[1.5rem] font-medium"
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    Black Life Everywhere
+                  </h4>
+                  <p
+                    className="text-lg text-white"
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </p>
+                  <Link
+                    className="text-lg underline text-blue-300 hover:text-blue-200"
+                    href="/black-life-everywhere"
+                    style={{
+                      fontFamily: 'Playfair',
+                    }}
+                  >
+                    Visit Black Life Everywhere →
+                  </Link>
+                </div>
+                <div></div>
               </div>
             </div>
           </section>

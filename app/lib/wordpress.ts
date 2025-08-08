@@ -4,7 +4,21 @@
 export interface WordPressUser {
   id: number;
   name: string;
+  username: string;
   description: string;
+  avatar_urls?: {
+    24?: string;
+    48?: string;
+    96?: string;
+  };
+  url?: string;
+  link?: string;
+  slug?: string;
+  // Social media fields (if available via ACF or custom fields)
+  twitter?: string;
+  instagram?: string;
+  linkedin?: string;
+  website?: string;
 }
 
 export interface WordPressPost {
@@ -118,7 +132,7 @@ const WORDPRESS_API_URL =
 
 const getAuthHeader = () => {
   const username = process.env.WP_USER;
-  const password = process.env.WP_APP_PASSWORD;
+  const password = process.env.NEW_WP_APP_PW;
   if (!username || !password) {
     throw new Error(
       'Missing WP_USER or WP_APP_PASSWORD in environment variables'
@@ -404,4 +418,123 @@ export async function fetchPostsByTags(
   const res = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`);
   if (!res.ok) throw new Error('Failed to fetch related articles');
   return res.json();
+}
+
+/**
+ * Fetch all authors/users from WordPress API
+ * @returns Promise<WordPressUser[]>
+ */
+export async function fetchAuthors(): Promise<WordPressUser[]> {
+  try {
+    const response = await fetch(`${WORDPRESS_API_URL}/users?_embed`, {
+      headers: {
+        Authorization: getAuthHeader(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const users: WordPressUser[] = await response.json();
+
+    // Filter out users who haven't published any posts (optional)
+    // You can remove this filter if you want to show all users
+    return users.filter(user => user.slug && user.name);
+  } catch (error) {
+    console.error('Error fetching authors:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch a single author by username
+ * @param username - WordPress username
+ * @returns Promise<WordPressUser | null>
+ */
+export async function fetchAuthorByUsername(
+  username: string
+): Promise<WordPressUser | null> {
+  try {
+    const response = await fetch(
+      `https://blackyouthproject.com/wp-json/byp/v1/author/${encodeURIComponent(
+        username
+      )}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data) {
+      return null;
+    }
+
+    const mappedUser: WordPressUser = {
+      id: data.id,
+      name: data.name || data.slug || '',
+      username: data.slug || username,
+      description: data.bio || '',
+      avatar_urls: data.avatar ? { 96: data.avatar } : undefined,
+      slug: data.slug,
+    };
+
+    return mappedUser;
+  } catch (error) {
+    console.error('Error fetching author by username:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch posts by author username
+ * @param username - WordPress username
+ * @param params - Query parameters
+ * @returns Promise<WordPressPost[]>
+ */
+export async function fetchPostsByAuthor(
+  username: string,
+  params: {
+    per_page?: number;
+    page?: number;
+  } = {}
+): Promise<WordPressPost[]> {
+  console.log('fetching posts by author', username);
+  try {
+    // First get the author to get their username/slug
+    const author = await fetchAuthorByUsername(username);
+    console.log('author', author);
+    if (!author || !author.username) {
+      return [];
+    }
+
+    // Build query using author_name instead of author ID
+    const searchParams = new URLSearchParams({
+      author_name: author.username,
+      _embed: '1',
+      per_page: (params.per_page || 10).toString(),
+      orderby: 'date',
+      order: 'desc',
+    });
+
+    if (params.page) {
+      searchParams.append('page', params.page.toString());
+    }
+
+    console.log(`${WORDPRESS_API_URL}/posts?${searchParams.toString()}`);
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/posts?${searchParams.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching posts by author:', error);
+    return [];
+  }
 }
