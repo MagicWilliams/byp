@@ -503,14 +503,14 @@ export async function fetchPostsByAuthor(
 ): Promise<WordPressPost[]> {
   console.log('fetching posts by author', username);
   try {
-    // First get the author to get their username/slug
+    // First get the author to get their username/slug and numeric ID
     const author = await fetchAuthorByUsername(username);
     console.log('author', author);
-    if (!author || !author.username) {
+    if (!author || !author.username || !author.id) {
       return [];
     }
 
-    // Build query using author_name instead of author ID
+    // Build query preferring author_name but also including author ID for extra safety
     const searchParams = new URLSearchParams({
       author_name: author.username,
       _embed: '1',
@@ -532,7 +532,38 @@ export async function fetchPostsByAuthor(
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const postsJson: any[] = await response.json();
+
+    // Ensure only posts authored by the resolved author ID are returned
+    const filtered = Array.isArray(postsJson)
+      ? postsJson.filter(post => {
+          let postAuthorId: number | null = null;
+          if (typeof post.author === 'number') {
+            postAuthorId = post.author;
+          } else if (
+            post &&
+            typeof post.author === 'object' &&
+            post.author &&
+            typeof post.author.id === 'number'
+          ) {
+            postAuthorId = post.author.id;
+          } else if (typeof post.post_author === 'number') {
+            postAuthorId = post.post_author;
+          } else if (
+            post &&
+            post._embedded &&
+            post._embedded.author &&
+            Array.isArray(post._embedded.author) &&
+            post._embedded.author.length > 0 &&
+            typeof post._embedded.author[0]?.id === 'number'
+          ) {
+            postAuthorId = post._embedded.author[0].id;
+          }
+          return postAuthorId === author.id;
+        })
+      : [];
+
+    return filtered as unknown as WordPressPost[];
   } catch (error) {
     console.error('Error fetching posts by author:', error);
     return [];
