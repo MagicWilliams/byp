@@ -43,6 +43,7 @@ export interface WordPressPost {
   _embedded?: {
     author: {
       name: string;
+      id: number;
       description: string;
     }[];
     'wp:term': (WordPressCategory[] | WordPressTag[])[];
@@ -532,7 +533,7 @@ export async function fetchPostsByAuthor(
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const postsJson: any[] = await response.json();
+    const postsJson: WordPressPost[] = await response.json();
 
     // Ensure only posts authored by the resolved author ID are returned
     const filtered = Array.isArray(postsJson)

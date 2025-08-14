@@ -24,6 +24,9 @@ async function fetchPosts(
     categories?: number[];
     tags?: number[];
     search?: string;
+    _embed?: boolean;
+    orderby?: string;
+    order?: 'asc' | 'desc' | string;
   } = {}
 ): Promise<WordPressPost[]> {
   const query = new URLSearchParams();
@@ -174,6 +177,11 @@ interface SiteState {
   categoryPostsLoading: Record<number, boolean>;
   categoryPostsError: Record<number, string | null>;
 
+  // General latest posts by page (for All Categories pagination)
+  generalPostsByPage: Record<number, WordPressPost[]>;
+  generalPostsLoadingByPage: Record<number, boolean>;
+  generalPostsErrorByPage: Record<number, string | null>;
+
   // Author-specific posts storage
   authorPosts: Record<string, WordPressPost[]>;
   authorPostsLoading: Record<string, boolean>;
@@ -210,6 +218,12 @@ interface SiteState {
     categories?: number[];
     tags?: number[];
     search?: string;
+    force?: boolean;
+  }) => Promise<void>;
+
+  fetchLatestPostsPage: (params?: {
+    per_page?: number;
+    page?: number;
     force?: boolean;
   }) => Promise<void>;
 
@@ -344,14 +358,21 @@ export const useSiteStore = create<SiteState>()(
       // Cache key for posts to handle different parameter combinations
       postsCacheKey: null,
 
+      // General latest posts by page (for pagination in "All Categories")
+      generalPostsByPage: {},
+      generalPostsLoadingByPage: {},
+      generalPostsErrorByPage: {},
+
       fetchPosts: async (params = {}) => {
         const { force = false, ...fetchParams } = params;
         const state = get();
 
-        // Standardize parameters to always fetch 100 posts with _embed
+        // Standardize parameters to always fetch 15 posts with _embed
         const standardizedParams = {
-          per_page: 100,
+          per_page: 15,
           _embed: true,
+          orderby: 'date',
+          order: 'desc',
           ...fetchParams,
         };
 
@@ -387,6 +408,86 @@ export const useSiteStore = create<SiteState>()(
               error instanceof Error ? error.message : 'Failed to fetch posts',
             postsLoading: false,
           });
+        }
+      },
+
+      fetchLatestPostsPage: async (params = {}) => {
+        const {
+          force = false,
+          page = 1,
+          per_page = 15,
+        } = params as {
+          force?: boolean;
+          page?: number;
+          per_page?: number;
+        };
+        const state = get();
+
+        // Page 1 is already handled by posts; only fetch if forced or missing/stale
+        if (
+          page === 1 &&
+          !force &&
+          state.posts.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return;
+        }
+
+        // If we already have this page cached and fresh, skip unless forced
+        const existing = state.generalPostsByPage[page] || [];
+        if (
+          !force &&
+          existing.length > 0 &&
+          !isDataStale(state.postsLastFetched)
+        ) {
+          return;
+        }
+
+        // Set loading state for this page
+        set(state => ({
+          generalPostsLoadingByPage: {
+            ...state.generalPostsLoadingByPage,
+            [page]: true,
+          },
+          generalPostsErrorByPage: {
+            ...state.generalPostsErrorByPage,
+            [page]: null,
+          },
+        }));
+
+        try {
+          const posts = await fetchPosts({
+            per_page,
+            page,
+            _embed: true,
+            orderby: 'date',
+            order: 'desc',
+          });
+          set(state => ({
+            generalPostsByPage: {
+              ...state.generalPostsByPage,
+              [page]: posts,
+            },
+            generalPostsLoadingByPage: {
+              ...state.generalPostsLoadingByPage,
+              [page]: false,
+            },
+            postsLastFetched: Date.now(),
+          }));
+        } catch (error) {
+          set(state => ({
+            generalPostsErrorByPage: {
+              ...state.generalPostsErrorByPage,
+              [page]:
+                error instanceof Error
+                  ? error.message
+                  : 'Failed to fetch posts',
+            },
+            generalPostsLoadingByPage: {
+              ...state.generalPostsLoadingByPage,
+              [page]: false,
+            },
+          }));
         }
       },
 

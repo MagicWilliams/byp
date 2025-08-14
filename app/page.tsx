@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     // Fetch data only if we don't have it or if it's stale
     // The store will automatically check cache and only fetch if needed
-    fetchPosts();
+    fetchPosts({ per_page: 15, page: 1 });
     fetchCategories();
   }, [fetchPosts, fetchCategories]);
 

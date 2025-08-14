@@ -61,8 +61,8 @@ export default function GetInvolved() {
                   We love to host content from new and emerging millennial
                   voices on pop culture, LGBTQIA+ issues, politics, feminism,
                   and many other topics. Pitches should include an estimated
-                  word count and summary about how the piece aligns with BYP's
-                  mission and voice.
+                  word count and summary about how the piece aligns with
+                  BYP&apos;s mission and voice.
                   <br />
                   <br />
                   All pitches should be sent to{' '}
@@ -88,10 +88,10 @@ export default function GetInvolved() {
                   If interested in republishing content you have already
                   written, you should follow a traditional pitching approach and
                   write a brief summary to help us understand how your content
-                  aligns with BYP's voice and mission. Your submission should
-                  include a link to the content on a platform you own (or have
-                  authority to grant reposting permission for). You should also
-                  include an author bio.
+                  aligns with BYP&apos;s voice and mission. Your submission
+                  should include a link to the content on a platform you own (or
+                  have authority to grant reposting permission for). You should
+                  also include an author bio.
                   <br />
                   <br />
                   All submissions should be sent to{' '}

@@ -43,30 +43,51 @@ export default function CategoriesSection({
     categoryPostsLoading,
     categoryPostsError,
     fetchPostsByCategoryId,
+    fetchLatestPostsPage,
+    generalPostsByPage,
+    generalPostsLoadingByPage,
+    generalPostsErrorByPage,
   } = useSiteStore();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-
+  const [page, setPage] = useState<number>(1);
+  console.log(categories);
   useEffect(() => {
     // Fetch posts when a category is selected
     if (selectedCategory) {
       fetchPostsByCategoryId(selectedCategory);
+    } else {
+      // For "All" we fetch by page beyond page 1 as needed
+      if (page > 1) {
+        fetchLatestPostsPage({ page, per_page: 15 });
+      }
     }
-  }, [selectedCategory, fetchPostsByCategoryId]);
+  }, [selectedCategory, page, fetchPostsByCategoryId, fetchLatestPostsPage]);
+
+  // Reset to page 1 when switching categories
+  useEffect(() => {
+    setPage(1);
+  }, [selectedCategory]);
 
   const filteredPosts = useMemo(() => {
     if (!selectedCategory) {
-      return posts;
+      // All categories: use page 1 from main posts; subsequent pages from cache
+      if (page === 1) return posts;
+      return generalPostsByPage[page] || [];
     }
     return categoryPosts[selectedCategory] || [];
-  }, [posts, selectedCategory, categoryPosts]);
+  }, [posts, selectedCategory, categoryPosts, page, generalPostsByPage]);
 
   const isLoading = selectedCategory
     ? categoryPostsLoading[selectedCategory] || false
-    : postsLoading;
+    : page === 1
+    ? postsLoading
+    : generalPostsLoadingByPage[page] || false;
 
   const error = selectedCategory
     ? categoryPostsError[selectedCategory] || null
-    : postsError;
+    : page === 1
+    ? postsError
+    : generalPostsErrorByPage[page] || null;
 
   return (
     <section className="py-4 pt-8 md:pt-12md:py-12 border-t-2 border-white">
@@ -126,16 +147,34 @@ export default function CategoriesSection({
               <div>Error loading posts for categories: {error}</div>
             ) : (
               // Show actual articles when loaded
-              filteredPosts.map((post, index) => {
-                if (index > 9) return null;
-                return (
-                  <div key={post.id} className="w-full">
-                    <ArticlePreview post={post} />
-                  </div>
-                );
-              })
+              filteredPosts.slice(0, 15).map(post => (
+                <div key={post.id} className="w-full">
+                  <ArticlePreview post={post} />
+                </div>
+              ))
             )}
           </div>
+
+          {/* Pagination for All Categories only */}
+          {!selectedCategory && (
+            <div className="flex items-center justify-center gap-4 mt-10">
+              <button
+                className={`px-4 py-2 border rounded text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1 || isLoading}
+              >
+                Previous
+              </button>
+              <span className="text-gray-300">Page {page}</span>
+              <button
+                className={`px-4 py-2 border rounded text-white disabled:opacity-50 disabled:cursor-not-allowed`}
+                onClick={() => setPage(p => p + 1)}
+                disabled={isLoading}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>
