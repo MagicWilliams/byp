@@ -11,9 +11,9 @@ interface AuthorBodyProps {
 
 export default function AuthorBody({ author, posts }: AuthorBodyProps) {
   return (
-    <div className="min-h-screen bg-[#111] w-full">
+    <div className="min-h-screen w-full bg-[url('/img/bkg.png')] bg-fixed bg-cover bg-center bg-no-repeat md:pt-12">
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-[#111] rounded-lg">
+        <div className="rounded-lg">
           <section className="mb-8 text-white flex flex-col gap-8">
             {/* Author Header */}
             <div className="flex flex-col sm:flex-row gap-8 items-start">
@@ -121,7 +121,7 @@ export default function AuthorBody({ author, posts }: AuthorBodyProps) {
                   {posts.map(post => (
                     <article
                       key={post.id}
-                      className="bg-gray-800 rounded-lg p-6"
+                      className="bg-black/50 rounded-lg p-6"
                     >
                       {post.jetpack_featured_media_url && (
                         <div className="mb-4">

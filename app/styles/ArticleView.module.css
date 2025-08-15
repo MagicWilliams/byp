@@ -41,3 +41,28 @@
   width: 100%;
   margin-bottom: 2.5rem;
 }
+
+/* Hero embed wrapper ensures full-width responsive iframe */
+.heroEmbed {
+  width: 100%;
+}
+
+.heroEmbedRatio {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+}
+
+.heroEmbedContent {
+  position: absolute;
+  inset: 0;
+}
+
+/* Force embedded players to fill the container */
+.heroEmbedContent :global(iframe),
+.heroEmbedContent :global(object),
+.heroEmbedContent :global(embed) {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}

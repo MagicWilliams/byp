@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 export default function GetInvolved() {
   return (
-    <div className="min-h-screen bg-[#111] w-full">
+    <div className="min-h-screen w-full bg-[url('/img/bkg.png')] bg-fixed bg-cover bg-center bg-no-repeat">
       <Header />
       <div className="w-full h-[500px] relative">
         <Image
@@ -15,7 +15,7 @@ export default function GetInvolved() {
         />
       </div>
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-[#111] rounded-lg">
+        <div className="rounded-lg">
           <section className="mb-8 text-white flex flex-col gap-8">
             <h1
               className="text-3xl font-medium py-8"
@@ -46,7 +46,7 @@ export default function GetInvolved() {
                 There are no currently available positions at this time.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-8 mb-8">
+            <div className="flex flex-col sm:flex-row gap-8 mb-8 bg-black/50 p-8 rounded-lg">
               <div className="flex flex-col gap-4 flex-1">
                 <h3
                   className="text-xl font-medium"

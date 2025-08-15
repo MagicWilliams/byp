@@ -11,6 +11,8 @@ import {
   WordPressPost,
   WordPressTag,
   fetchPostsByTags,
+  fetchTagsByIds,
+  WordPressUser,
 } from '../lib/wordpress';
 import Header from './Header';
 import Tag from './Tag';
@@ -23,14 +25,9 @@ interface ArticleViewProps {
 export default function ArticleView({ slug }: ArticleViewProps) {
   const [post, setPost] = useState<WordPressPost | null>(null);
   const [related, setRelated] = useState<WordPressPost[]>([]);
+  const [tags, setTags] = useState<WordPressTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  interface WordPressTerm {
-    id: number;
-    name: string;
-    taxonomy: string;
-  }
 
   useEffect(() => {
     const loadPost = async () => {
@@ -40,20 +37,21 @@ export default function ArticleView({ slug }: ArticleViewProps) {
         const postData = await fetchPost(slug);
         setPost(postData);
         if (postData) {
-          // Fetch related articles after post is loaded
-          const terms = postData._embedded?.['wp:term'] || [];
-          const tags = terms
-            .flat()
-            .filter((term: WordPressTerm) => term.taxonomy === 'post_tag');
-          if (tags.length > 0) {
-            const tagIds = tags.map((tag: WordPressTerm) => tag.id);
-            const relatedPosts = await fetchPostsByTags(tagIds, postData.id);
+          const tagIds = Array.isArray(postData.tags) ? postData.tags : [];
+          if (tagIds.length > 0) {
+            const [relatedPosts, tagList] = await Promise.all([
+              fetchPostsByTags(tagIds, postData.id),
+              fetchTagsByIds(tagIds),
+            ]);
             setRelated(relatedPosts);
+            setTags(tagList);
           } else {
             setRelated([]);
+            setTags([]);
           }
         } else {
           setRelated([]);
+          setTags([]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load article');
@@ -97,17 +95,39 @@ export default function ArticleView({ slug }: ArticleViewProps) {
     );
   }
 
-  const author = post._embedded?.author?.[0];
-  const terms = post._embedded?.['wp:term'] || [];
-  const tags = terms
-    .flat()
-    .filter(term => term.taxonomy === 'post_tag') as WordPressTag[];
+  const author =
+    post && typeof post.author === 'object'
+      ? (post.author as WordPressUser)
+      : null;
 
   return (
     <div className="min-h-screen bg-white pb-1">
       <Header />
 
-      {post.jetpack_featured_media_url && (
+      {post.hero_media?.source === 'external' && post.hero_media_embed_html ? (
+        <div className="w-full">
+          <div className={styles.heroEmbed}>
+            <div className={styles.heroEmbedRatio}>
+              <div
+                className={styles.heroEmbedContent}
+                dangerouslySetInnerHTML={{
+                  __html: post.hero_media_embed_html || '',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      ) : post.hero_media_url ? (
+        <div className="w-full">
+          <video
+            src={post.hero_media_url}
+            className="w-full h-auto max-h-[80vh] object-cover"
+            controls
+            playsInline
+            preload="metadata"
+          />
+        </div>
+      ) : post.jetpack_featured_media_url ? (
         <div className="w-full">
           <Image
             src={post.jetpack_featured_media_url}
@@ -117,7 +137,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
             height={1000}
           />
         </div>
-      )}
+      ) : null}
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 md:py-12 py-4">
         <article>

@@ -28,7 +28,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
     const posts = await fetchPostsByAuthor(slug, { per_page: 10 });
 
     return (
-      <div className="min-h-screen bg-[#111] w-full">
+      <div className="min-h-screen w-full">
         <Header />
         <AuthorBody author={author} posts={posts} />
         <Footer />

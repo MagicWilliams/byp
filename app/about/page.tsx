@@ -12,10 +12,10 @@ export default function About() {
     { name: 'Jill Doe', title: 'CFO', image: '/img/person.png' },
   ];
   return (
-    <div className="min-h-screen bg-[#111] w-full">
+    <div className="min-h-screen w-full bg-[url('/img/bkg.png')] bg-fixed bg-cover bg-center bg-no-repeat">
       <Header />
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-[#111] rounded-lg">
+        <div className="rounded-lg">
           <section className="mb-8 text-white flex flex-col gap-8">
             <h1
               className="text-3xl font-medium py-8 text-center"
@@ -30,7 +30,7 @@ export default function About() {
               behavior in critical domains such as sex, health, and politics.
             </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:mb-8">
               <div className="sm:border-r sm:border-gray-600 sm:pr-4">
                 <p
                   className="text-lg text-white"
@@ -53,7 +53,7 @@ export default function About() {
                 />
               </div>
             </div>
-            <div className="flex flex-col gap-8 mb-12">
+            <div className="flex flex-col gap-8 mb-12 bg-black/50 p-8 rounded-lg">
               <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
                 Our Team
               </h3>
@@ -84,7 +84,7 @@ export default function About() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-8">
+            <div className="flex flex-col gap-8 bg-black/50 p-8 rounded-lg">
               <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
                 Our Programs
               </h3>

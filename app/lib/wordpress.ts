@@ -35,7 +35,8 @@ export interface WordPressPost {
   date: string;
   modified: string;
   slug: string;
-  author: WordPressUser;
+  // WordPress core returns a numeric author ID unless expanded.
+  author: number | WordPressUser;
   featured_media: number;
   categories: number[];
   tags: number[];
@@ -48,6 +49,18 @@ export interface WordPressPost {
     }[];
     'wp:term': (WordPressCategory[] | WordPressTag[])[];
   };
+  // New hero media fields
+  hero_media?: {
+    source?: string | null;
+    id?: number | null;
+    url?: string | null;
+    external_url?: string | null;
+    embed_html?: string | null;
+  } | null;
+  // Top-level fallbacks from REST for convenience
+  hero_media_url?: string | null;
+  hero_media_embed_html?: string | null;
+  hero_media_external_url?: string | null;
   post_name: string;
   post_title: string;
   post_excerpt: string;
@@ -263,6 +276,28 @@ export async function fetchTags(): Promise<WordPressTag[]> {
 }
 
 /**
+ * Fetch tags by their numeric IDs
+ */
+export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
+  if (!ids || ids.length === 0) return [];
+  try {
+    const params = new URLSearchParams({
+      include: ids.join(','),
+      per_page: String(ids.length),
+      _fields: 'id,name,slug,description,count,taxonomy',
+    });
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/tags?${params.toString()}`
+    );
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching tags by IDs:', error);
+    return [];
+  }
+}
+
+/**
  * Fetch categories from WordPress API
  * @returns Promise<WordPressCategory[]>
  */
@@ -325,15 +360,36 @@ export async function fetchPost(
   identifier: string | number
 ): Promise<WordPressPost | null> {
   try {
+    const fields = [
+      'id',
+      'date',
+      'modified',
+      'slug',
+      'title.rendered',
+      'content.rendered',
+      'excerpt.rendered',
+      'author',
+      'categories',
+      'tags',
+      'featured_media',
+      'jetpack_featured_media_url',
+      'hero_media',
+      'hero_media_url',
+      'hero_media_embed_html',
+      'hero_media_external_url',
+    ].join(',');
+
     let response;
     if (typeof identifier === 'string') {
-      // Fetching by slug
       response = await fetch(
-        `${WORDPRESS_API_URL}/posts?slug=${identifier}&_embed`
+        `${WORDPRESS_API_URL}/posts?slug=${encodeURIComponent(
+          identifier
+        )}&per_page=1&_fields=${fields}`
       );
     } else {
-      // Fetching by ID
-      response = await fetch(`${WORDPRESS_API_URL}/posts/${identifier}?_embed`);
+      response = await fetch(
+        `${WORDPRESS_API_URL}/posts/${identifier}?_fields=${fields}`
+      );
     }
 
     if (!response.ok) {
@@ -341,61 +397,10 @@ export async function fetchPost(
     }
 
     const posts = await response.json();
+    const post: WordPressPost = Array.isArray(posts) ? posts[0] ?? null : posts;
+    if (!post) return null;
 
-    // When fetching by slug, the API returns an array.
-    const post = Array.isArray(posts)
-      ? posts.length > 0
-        ? posts[0]
-        : null
-      : posts;
-
-    if (!post) {
-      return null;
-    }
-
-    // Extract author information from embedded data
-    if (
-      post._embedded &&
-      post._embedded.author &&
-      post._embedded.author.length > 0
-    ) {
-      const authorData = post._embedded.author[0];
-      post.author = {
-        id: authorData.id || post.post_author,
-        name: authorData.name || '',
-        description: authorData.description || '',
-      };
-    } else if (post.post_author) {
-      // Fallback: fetch author information separately if not embedded
-      try {
-        const authorResponse = await fetch(
-          `${WORDPRESS_API_URL}/users/${post.post_author}`,
-          {
-            headers: {
-              Authorization: getAuthHeader(),
-            },
-          }
-        );
-        if (authorResponse.ok) {
-          const authorData = await authorResponse.json();
-          post.author = {
-            id: authorData.id,
-            name: authorData.name,
-            description: authorData.description,
-          };
-        }
-      } catch (authorError) {
-        console.error('Error fetching author information:', authorError);
-        // Set a default author object if we can't fetch the author
-        post.author = {
-          id: post.post_author,
-          name: 'Unknown Author',
-          description: '',
-        };
-      }
-    }
-
-    return post;
+    return post as WordPressPost;
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
@@ -409,9 +414,21 @@ export async function fetchPostsByTags(
   if (!tagIds || tagIds.length === 0) return [];
   // Only use the first tag for matching
   const params = new URLSearchParams({
-    _embed: '1',
     tags: String(tagIds[0]),
     per_page: '3',
+    _fields: [
+      'id',
+      'slug',
+      'title.rendered',
+      'jetpack_featured_media_url',
+      'author',
+      'categories',
+      'tags',
+      'hero_media',
+      'hero_media_url',
+      'hero_media_embed_html',
+      'hero_media_external_url',
+    ].join(','),
   });
   if (excludePostId) {
     params.append('exclude', excludePostId.toString());
