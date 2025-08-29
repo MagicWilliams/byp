@@ -8,7 +8,7 @@ export default function GetInvolved() {
       <Header />
       <div className="w-full h-[500px] relative">
         <Image
-          src="/img/get-involved.png"
+          src="/img/get_involved.jpg"
           alt="Get Involved"
           fill
           objectFit="cover"

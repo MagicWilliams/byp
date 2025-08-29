@@ -12,7 +12,7 @@ export default function About() {
     { name: 'Jill Doe', title: 'CFO', image: '/img/person.png' },
   ];
   return (
-    <div className="min-h-screen w-full bg-[url('/img/bkg.png')] bg-fixed bg-cover bg-center bg-no-repeat">
+    <div className="min-h-screen w-full bg-[url('/img/bkg.png')] bg-cover bg-center bg-no-repeat bg-attachment-fixed">
       <Header />
       <main className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="rounded-lg">
@@ -46,7 +46,7 @@ export default function About() {
               </div>
               <div className="w-full h-full flex justify-center items-center sm:pl-4">
                 <Image
-                  src="/img/community.png"
+                  src="/img/community.jpg"
                   alt="Black Youth Project"
                   width={500}
                   height={500}

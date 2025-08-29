@@ -32,7 +32,7 @@ export default function Home() {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen bg-fixed bg-cover"
       style={{
         backgroundImage: featuredPost?.jetpack_featured_media_url
           ? `linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url(${featuredPost.jetpack_featured_media_url})`
