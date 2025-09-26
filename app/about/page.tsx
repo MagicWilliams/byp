@@ -16,10 +16,11 @@ export default function About() {
               About Us
             </h1>
             <h3 className="w-[90%] mx-auto max-w-7xl text-[2rem] mb-8 text-center text-white">
-              The Black Youth Project will examine the attitudes, resources, and
-              culture of the young, urban black millennial, exploring how these
-              factors and others influence their decision-making, norms, and
-              behavior in critical domains such as sex, health, and politics.
+              The Black Youth Project was founded in 2005 by Black feminist
+              scholar Professor Cathy Cohen to center the lives, struggles, and
+              visions of Black youth. What began as a national research study
+              has grown into an ecosystem that makes Black youth knowledge,
+              culture, and resistance impossible to ignore.
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:mb-8">
@@ -28,12 +29,33 @@ export default function About() {
                   className="text-lg text-white"
                   style={{ fontFamily: 'Playfair' }}
                 >
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                  laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-                  irure dolor in reprehenderit in voluptate velit esse cillum
-                  dolore eu fugiat nulla pariatur.
+                  Through our research arm, GenForward, we produce survey data
+                  on young people of color nationwide. One of our anchor
+                  projects, Black Life Everywhere, aims to reflect the insights
+                  of this data into analysis, media, art, and curricula that
+                  amplify Black Gen Z and millennial voices—equipping
+                  organizers, educators, journalists, academics and young adults
+                  themselves with tools for understanding and liberation.
+                  <br />
+                  <br />
+                  In the multiple forms of expression found throughout the
+                  projects of the Black Youth Project, the audiences will see
+                  how Black youth confront the ongoing failures of American
+                  democracy: policing, health inequities, economic abandonment,
+                  sexual politics, and more. Our work exposes what institutions
+                  refuse to admit: Black youth are not only shaped by these
+                  crises—they are shaping the responses, strategies, and visions
+                  that will define our collective future. BYP is both archive
+                  and arsenal. We publish commentary, cultural analysis,
+                  political surveys, and art that highlight the diversity and
+                  brilliance of Black people.
+                  <br />
+                  <br />
+                  At its core, the Black Youth Project is a refusal: to let
+                  Black people, especially young adults, be pathologized,
+                  ignored, or reduced to stereotypes. We affirm them as
+                  producers of knowledge, architects of culture, and leaders
+                  shaping politics and resistance in real time.
                 </p>
               </div>
               <div className="w-full h-full flex justify-center items-center sm:pl-4">
@@ -261,7 +283,7 @@ export default function About() {
 
             <div className="flex flex-col gap-8 bg-black/50 p-8 rounded-lg">
               <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
-                Our Programs
+                Our History
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-4">
@@ -275,36 +297,52 @@ export default function About() {
                     className="text-lg text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </p>
-                  <p
-                    className="text-lg text-white"
-                    style={{ fontFamily: 'Playfair' }}
-                  >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    The Black Youth Project started as a national research
+                    project in 2005 to examine and highlight the attitudes,
+                    resources, and culture of African American youth ages 15 to
+                    25. The focus of the work was on exploring the political and
+                    civic attitudes, actions and culture of African American
+                    youth, examining how these factors and others influence
+                    their decision-making and normative assessments in critical
+                    domains such as sex and politics, and using those insights
+                    to develop creative and effective ways to facilitate the
+                    political and civic empowerment of young black people and
+                    other young people of color. Understanding the need to make
+                    this data available to a wider constituency beyond the
+                    academy Professor Cathy Cohen, the Black Youth Project’s
+                    founder and principal investigator, decided to create an
+                    online hub for Black young adults where scholars, educators,
+                    community activists, allies, and youth could access the
+                    study’s research summaries as well as have access to a
+                    plethora of resources concerning the empowerment and
+                    development of Black youth.
                   </p>
                 </div>
                 <div className="flex flex-col gap-4">
                   <h4
                     className="text-[1.5rem] font-medium"
-                    style={{ fontFamily: 'Playfair' }}
+                    style={{ color: 'transparent', fontFamily: 'Playfair' }}
                   >
-                    Black Life Everywhere
+                    Continued
                   </h4>
                   <p
                     className="text-lg text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    Over the years the website has significantly increased its
+                    reach and impact. We have developed one of the only
+                    platforms on the internet where the voices of black youth
+                    and young adults are accurately represented without
+                    censorship. Within the website, visitors can access research
+                    summaries, read blogs about and by black youth, search an
+                    extensive rap database, access black youth social justice
+                    organizations, and download social justice curricula to
+                    teach. We believe the BYP website is one of a small number
+                    of new media sites that black youth can truly call their
+                    own. Thus, the BYP stands as an example of a project working
+                    to expand the human and social capital of young African
+                    Americans and facilitating their full participation in the
+                    democratic process.
                   </p>
                   <Link
                     className="text-lg underline text-blue-300 hover:text-blue-200"
