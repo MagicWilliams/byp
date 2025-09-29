@@ -58,13 +58,16 @@ export default function About() {
                   shaping politics and resistance in real time.
                 </p>
               </div>
-              <div className="w-full h-full flex justify-center items-center sm:pl-4">
-                <Image
-                  src="/img/community.jpg"
-                  alt="Black Youth Project"
-                  width={500}
-                  height={500}
-                />
+              <div className="w-full sm:pl-4">
+                <div className="relative w-full aspect-square">
+                  <Image
+                    src="/img/community.jpg"
+                    alt="Black Youth Project"
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 640px) 50vw, 100vw"
+                  />
+                </div>
               </div>
             </div>
             <div className="flex flex-col gap-8 mb-12 bg-black/50 p-8 rounded-lg">
@@ -73,14 +76,15 @@ export default function About() {
               </h3>
               <div className="grid md:grid-cols-2 gap-16">
                 <div>
-                  <Image
-                    style={{ width: '100%', height: 'auto' }}
-                    className="mb-4"
-                    src="/img/cathy.jpg"
-                    alt="Cathy Cohen"
-                    width={400}
-                    height={400}
-                  />
+                  <div className="relative w-full aspect-square mb-4">
+                    <Image
+                      src="/img/cathy.jpg"
+                      alt="Cathy Cohen"
+                      fill
+                      className="object-cover object-top"
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                    />
+                  </div>
                   <h3
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
@@ -150,14 +154,15 @@ export default function About() {
                   </p>
                 </div>
                 <div>
-                  <Image
-                    style={{ width: '100%', height: 'auto' }}
-                    className="mb-4"
-                    src="/img/taji.jpg"
-                    alt="Taji Chesimet"
-                    width={400}
-                    height={400}
-                  />
+                  <div className="relative w-full aspect-square mb-4">
+                    <Image
+                      src="/img/taji.jpg"
+                      alt="Taji Chesimet"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                    />
+                  </div>
                   <h3
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
@@ -192,14 +197,15 @@ export default function About() {
                   </p>
                 </div>
                 <div>
-                  <Image
-                    style={{ width: '100%', height: 'auto' }}
-                    className="mb-4"
-                    src="/img/amber.jpg"
-                    alt="Amber Butts"
-                    width={400}
-                    height={400}
-                  />
+                  <div className="relative w-full aspect-square mb-4">
+                    <Image
+                      src="/img/amber.jpg"
+                      alt="Amber Butts"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                    />
+                  </div>
                   <h3
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
@@ -227,14 +233,15 @@ export default function About() {
                   </p>
                 </div>
                 <div>
-                  <Image
-                    style={{ width: '100%', height: 'auto' }}
-                    className="mb-4"
-                    src="/img/jonathan.png"
-                    alt="Jonathan Lykes"
-                    width={400}
-                    height={400}
-                  />
+                  <div className="relative w-full aspect-square mb-4">
+                    <Image
+                      src="/img/jonathan.png"
+                      alt="Jonathan Lykes"
+                      fill
+                      className="object-cover"
+                      sizes="(min-width: 768px) 50vw, 100vw"
+                    />
+                  </div>
                   <h3
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
