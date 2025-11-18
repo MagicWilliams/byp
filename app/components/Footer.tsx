@@ -46,11 +46,9 @@ export default function Footer() {
           style={{ fontFamily: 'Gill Sans' }}
           className="w-full max-w-7xl flex flex-wrap text-center font-medium justify-center space-x-4 space-y-4 mb-8 text-sm"
         >
-          <Link href="/byp100">BYP100</Link>
           <Link href="/contact">Contact Us</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/submissions">Submissions</Link>
-          <Link href="/work-with-byp">Work With BYP</Link>
           <Link href="/donate">Donate</Link>
           <Link href="/about">About Us</Link>
         </nav>
