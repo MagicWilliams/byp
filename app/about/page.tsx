@@ -156,8 +156,8 @@ export default function About() {
                 <div>
                   <div className="relative w-full aspect-square mb-4">
                     <Image
-                      src="/img/taji.jpg"
-                      alt="Taji Chesimet"
+                      src="/img/jenn.jpg"
+                      alt="Jenn M. Jackson, PhD"
                       fill
                       className="object-cover"
                       sizes="(min-width: 768px) 50vw, 100vw"
@@ -167,33 +167,48 @@ export default function About() {
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Taji Chesimet
+                    Jenn M. Jackson, PhD
                   </h3>
                   <p
                     className="text-lg text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Taji is a writer, performer, and community organizer. A 2024
-                    graduate of the University of Chicago with a Bachelors in
-                    Race, Diaspora, and Indigeneity, he concentrated on carceral
-                    studies, social movements, and film. Originally from
-                    Portland, OR he has been engaged in politics and community
-                    building since high school. He was one of the former Chairs
-                    of the Portland Committee on Community Engaged-Policing,
-                    appointed by the Mayor of Portland. He was one of the
-                    Directors/Founders of the youth-run organization Raising
-                    Justice. Taji previously served on the Board of the
-                    Restorative Justice Coalition of Oregon, the Local Public
-                    Safety Coordinating Committee. He has supported the work of
-                    Parole Illinois, Prison Neighborhood Arts+Education Project,
-                    the ACLU of Oregon, Race Talks PDX, Pennsylvania Innocence
-                    Project, Impact-Justice, Senator Akasha Lawrence-Spence (OR
-                    D-18), and he advised on the mayoral campaign of Sarah
-                    Iannarone, the 2020 Public Safety Task Force. With a
-                    particular interest in community building, Taji aims to work
-                    at the intersections of Performance, Abolition, and
-                    Political Mobilization to fight for transformative justice
-                    and end the systems of oppression impacting our communities.
+                    Jenn M. Jackson (they/them) is a genderflux androgynous
+                    Black woman, a lesbian, an abolitionist, a lover of all
+                    Black people, and an Assistant Professor at Syracuse
+                    University in the Department of Political Science. Jackson’s
+                    primary research is in Black Politics with a focus on racial
+                    threat and trauma, gender and sexuality, political behavior,
+                    policing, and social movements. Jackson holds affiliate
+                    positions in African American Studies, Women’s and Gender
+                    Studies, and LGBT Studies. They are a Senior Research
+                    Associate at The Campbell Public Affairs Institute at the
+                    Maxwell School at Syracuse University, as well. Jackson is
+                    the author of the book BLACK WOMEN TAUGHT US: AN INTIMATE
+                    HISTORY OF BLACK FEMINISM (Random House Press, 2024). The
+                    book is an intimate intellectual and political history of
+                    Black women’s activism, movement organizing, and
+                    philosophical work that explores how women from Harriet
+                    Jacobs to Audre Lorde to the members of the Combahee River
+                    Collective, among others, have for centuries taught us how
+                    to fight for justice and radically reimagine a more just
+                    world for us all. Jackson’s first academic book project
+                    POLICING BLACKNESS: THE POLITICAL STAKES OF INTERSECTIONAL
+                    THREAT (expected 2026) investigates the role of racial
+                    threat in influencing Black Americans’ political behavior.
+                    Methodologically, they utilize quantitative analyses of
+                    survey data and experiments as well as qualitative analysis
+                    of 100 in-depth interviews with young Black Americans ages
+                    18 to 35 to investigate both intergroup and intragroup
+                    differences in responses to and ideas about racial threat.
+                    Jackson finds that Black women are most likely to express
+                    concerns about police-based and intragroup threat.
+                    Comparatively, Black men vary drastically in their responses
+                    to threat depending on their sexual orientation, gender
+                    expression, and vulnerability to stereotypes. As a recipient
+                    of many prestigious honors and awards, Jackson is a 2020
+                    recipient of the Tenth Decade grant ($20,000) and the CUSE
+                    Seed Grant ($5,000) funding their book research.
                   </p>
                 </div>
                 <div>
@@ -235,8 +250,8 @@ export default function About() {
                 <div>
                   <div className="relative w-full aspect-square mb-4">
                     <Image
-                      src="/img/jonathan.png"
-                      alt="Jonathan Lykes"
+                      src="/img/everic.jpg"
+                      alt="Everic White"
                       fill
                       className="object-cover"
                       sizes="(min-width: 768px) 50vw, 100vw"
@@ -246,43 +261,39 @@ export default function About() {
                     className="text-2xl mb-2 text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Jonathan Lykes
+                    Everic White
                   </h3>
                   <p
                     className="text-lg text-white"
                     style={{ fontFamily: 'Playfair' }}
                   >
-                    Jonathan Lykes is a Black queer artist, activist and
-                    academic. His interdisciplinary approach to art, activism
-                    and anti-oppression work, merges policy change, artistic
-                    expression and activism. Combining these forms of social
-                    transformation—and harnessing their synergy—Jonathan works
-                    to create awareness, promote personal healing, surmount
-                    institutional barriers and generate systemic change.
-                    Jonathan&apos;s current position as Founder/Executive
-                    Director of Liberation House merges his multidisciplinary
-                    artistic background with public policy reform, community
-                    engagement and systems change work to teach liberation
-                    praxis by pushing the revolutionary edge of radical
-                    transformative movement work. Lykes is also the Director of
-                    Policy and Programs for Black Youth Project/GenForward
-                    Survey. Lykes is also a co-founder of Black Youth Project
-                    100 (BYP100), a movement of young adults using a Black Queer
-                    Feminist lens to advocate for community and institutional
-                    change. Through BYP100, Jonathan curated a freedom song and
-                    chant album, The Black Joy Experience, helping to teach
-                    holistic energy through the Black radical tradition. He
-                    earned his bachelor&apos;s degree from the University of
-                    Chicago, where he also received his master&apos;s degree
-                    from the Crown School for Social Work and Policy. For more
-                    info visit:{' '}
-                    <Link
-                      className="text-blue-300 hover:text-blue-200 underline"
-                      href="https://liberationhouse.org"
-                      target="_blank"
-                    >
-                      LiberationHouse.org
-                    </Link>
+                    Everic White is a digital journalist and social media
+                    strategist currently serving as lead curation editor for BBC
+                    Studios, where he manages the team programming the BBC.com
+                    homepage and app. Previously, he was a senior platform
+                    editor at the Wall Street Journal, leading nightside
+                    homepage, app, and alert production and strategy. Before
+                    that, he was deputy social media director at Forbes, where
+                    he supervised the social media team and developed
+                    social-first content for flagship lists, events, and
+                    editorial programming. From 2018 to 2021, he was a social
+                    media editor for Bloomberg Quicktake, creating enterprise,
+                    live, and breaking news content for social, digital, and OTT
+                    audiences. He has also held social and digital production
+                    roles at The Guardian US, NY1 News, POLITICO, FiOS1 News,
+                    and CNBC. Before journalism, Everic worked as a social media
+                    manager and digital strategist for brands including eBay,
+                    Samsung, Unilever, IZOD, AXE, AND1, American Idol,
+                    Cap&apos;n Crunch, and BET, creating online customer support
+                    portals, curating user-generated content, and designing
+                    social media programs for live events. He studied at the
+                    Craig Newmark Graduate School of Journalism at CUNY
+                    (concentrating in urban reporting and specializing in
+                    interactive journalism), Drexel University in 2011, and Rye
+                    Country Day School in 2006. Born in Mount Vernon, New York,
+                    he wrote for his personal site Dear Whoever in college—a
+                    collection of open letters directed at figures in hip-hop,
+                    sports, politics, and Black culture.
                   </p>
                 </div>
               </div>
