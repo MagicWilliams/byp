@@ -2,6 +2,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 
+// Cache for 5 minutes (300 seconds)
+export const revalidate = 300;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,7 +21,10 @@ export async function GET(request: NextRequest) {
     queryParams.append('_embed', '1');
 
     const wpRes = await fetch(
-      `https://blackyouthproject.com/wp-json/wp/v2/posts?${queryParams.toString()}`
+      `https://blackyouthproject.com/wp-json/wp/v2/posts?${queryParams.toString()}`,
+      {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      }
     );
 
     if (!wpRes.ok) {

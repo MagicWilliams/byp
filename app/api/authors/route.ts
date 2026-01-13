@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchAuthors, fetchAuthorByUsername } from '../../lib/wordpress';
 
+// Cache for 5 minutes (300 seconds)
+export const revalidate = 300;
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

@@ -50,7 +50,6 @@ export default function CategoriesSection({
   } = useSiteStore();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [page, setPage] = useState<number>(1);
-  console.log(categories);
   useEffect(() => {
     // Fetch posts when a category is selected
     if (selectedCategory) {

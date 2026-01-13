@@ -164,7 +164,10 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
   try {
     const timestamp = Date.now();
     const response = await fetch(
-      `${WORDPRESS_API_URL}/issue?acf_format=standard&_t=${timestamp}`
+      `${WORDPRESS_API_URL}/issue?acf_format=standard&_t=${timestamp}`,
+      {
+        next: { revalidate: 60 }, // Cache for 1 minute
+      }
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -181,7 +184,10 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
             issue.acf.associated_posts.map(async (post: BLEAssociatedPost) => {
               try {
                 const wpPostRes = await fetch(
-                  `${WORDPRESS_API_URL}/posts/${post.ID}`
+                  `${WORDPRESS_API_URL}/posts/${post.ID}`,
+                  {
+                    next: { revalidate: 300 }, // Cache for 5 minutes
+                  }
                 );
                 if (!wpPostRes.ok)
                   throw new Error(
@@ -198,6 +204,7 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
                       headers: {
                         Authorization: getAuthHeader(),
                       },
+                      next: { revalidate: 300 }, // Cache for 5 minutes
                     }
                   );
                   if (authorRes.ok) {
@@ -240,7 +247,9 @@ export async function getFeaturedImageUrl(
   mediaId: number
 ): Promise<string | null> {
   try {
-    const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`);
+    const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
 
     if (!response.ok) {
       throw new Error(
@@ -262,7 +271,9 @@ export async function getFeaturedImageUrl(
  */
 export async function fetchTags(): Promise<WordPressTag[]> {
   try {
-    const response = await fetch(`${WORDPRESS_API_URL}/tags`);
+    const response = await fetch(`${WORDPRESS_API_URL}/tags`, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -287,7 +298,10 @@ export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
       _fields: 'id,name,slug,description,count,taxonomy',
     });
     const response = await fetch(
-      `${WORDPRESS_API_URL}/tags?${params.toString()}`
+      `${WORDPRESS_API_URL}/tags?${params.toString()}`,
+      {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      }
     );
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
@@ -303,7 +317,9 @@ export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
  */
 export async function fetchCategories(): Promise<WordPressCategory[]> {
   try {
-    const response = await fetch(`${WORDPRESS_API_URL}/categories`);
+    const response = await fetch(`${WORDPRESS_API_URL}/categories`, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -337,7 +353,10 @@ export async function fetchPages(
     if (params.search) searchParams.append('search', params.search);
 
     const response = await fetch(
-      `${WORDPRESS_API_URL}/pages?${searchParams.toString()}`
+      `${WORDPRESS_API_URL}/pages?${searchParams.toString()}`,
+      {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      }
     );
 
     if (!response.ok) {
@@ -384,11 +403,17 @@ export async function fetchPost(
       response = await fetch(
         `${WORDPRESS_API_URL}/posts?slug=${encodeURIComponent(
           identifier
-        )}&per_page=1&_fields=${fields}`
+        )}&per_page=1&_fields=${fields}`,
+        {
+          next: { revalidate: 300 }, // Cache for 5 minutes
+        }
       );
     } else {
       response = await fetch(
-        `${WORDPRESS_API_URL}/posts/${identifier}?_fields=${fields}`
+        `${WORDPRESS_API_URL}/posts/${identifier}?_fields=${fields}`,
+        {
+          next: { revalidate: 300 }, // Cache for 5 minutes
+        }
       );
     }
 
@@ -433,7 +458,9 @@ export async function fetchPostsByTags(
   if (excludePostId) {
     params.append('exclude', excludePostId.toString());
   }
-  const res = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`);
+  const res = await fetch(`${WORDPRESS_API_URL}/posts?${params.toString()}`, {
+    next: { revalidate: 300 }, // Cache for 5 minutes
+  });
   if (!res.ok) throw new Error('Failed to fetch related articles');
   return res.json();
 }
@@ -448,6 +475,7 @@ export async function fetchAuthors(): Promise<WordPressUser[]> {
       headers: {
         Authorization: getAuthHeader(),
       },
+      next: { revalidate: 300 }, // Cache for 5 minutes
     });
 
     if (!response.ok) {
@@ -477,7 +505,10 @@ export async function fetchAuthorByUsername(
     const response = await fetch(
       `https://blackyouthproject.com/wp-json/byp/v1/author/${encodeURIComponent(
         username
-      )}`
+      )}`,
+      {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      }
     );
 
     if (!response.ok) {
