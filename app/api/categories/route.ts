@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       queryParams.append('hide_empty', 'true');
     }
 
-    const wpApiUrl = `https://blackyouthproject.com/wp-json/wp/v2/categories?${queryParams.toString()}`;
+    const wpApiUrl = `https://wp.blackyouthproject.com/wp-json/wp/v2/categories?${queryParams.toString()}`;
     const response = await fetch(wpApiUrl, {
       next: { revalidate: 300 }, // Cache for 5 minutes
     });

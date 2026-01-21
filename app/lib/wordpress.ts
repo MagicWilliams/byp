@@ -142,7 +142,7 @@ export interface BLEIssue {
 
 // WordPress API configuration
 const WORDPRESS_API_URL =
-  process.env.WP_API_URL || 'https://blackyouthproject.com/wp-json/wp/v2';
+  process.env.WP_API_URL || 'https://wp.blackyouthproject.com/wp-json/wp/v2';
 
 const getAuthHeader = () => {
   const username = process.env.WP_USER;
@@ -503,7 +503,7 @@ export async function fetchAuthorByUsername(
 ): Promise<WordPressUser | null> {
   try {
     const response = await fetch(
-      `https://blackyouthproject.com/wp-json/byp/v1/author/${encodeURIComponent(
+      `https://wp.blackyouthproject.com/wp-json/byp/v1/author/${encodeURIComponent(
         username
       )}`,
       {

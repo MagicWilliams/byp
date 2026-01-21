@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const wpRes = await fetch(
-      `https://blackyouthproject.com/wp-json/wp/v2/tags?${queryParams.toString()}`,
+      `https://wp.blackyouthproject.com/wp-json/wp/v2/tags?${queryParams.toString()}`,
       {
         next: { revalidate: 300 }, // Cache for 5 minutes
       }

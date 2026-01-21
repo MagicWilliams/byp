@@ -62,7 +62,7 @@ The application includes stubbed WordPress API functions in `app/lib/wordpress.t
 Set up your WordPress API URL in your environment:
 
 ```env
-WORDPRESS_API_URL=https://blackyouthproject.com/wp-json/wp/v2
+WORDPRESS_API_URL=https://wp.blackyouthproject.com/wp-json/wp/v2
 ```
 
 ## Getting Started

@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'wp.blackyouthproject.com',
+      },
+      {
+        protocol: 'https',
         hostname: 'secure.gravatar.com',
       },
     ],
