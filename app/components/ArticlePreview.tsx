@@ -14,14 +14,25 @@ export interface ArticlePreviewProps {
     };
   };
   isBle?: boolean;
+  /** Use white title and light excerpt (e.g. on dark background) */
+  darkBg?: boolean;
 }
 
 export default function ArticlePreview({
   post,
   isBle = false,
+  darkBg = false,
 }: ArticlePreviewProps) {
-  const excerptColor = isBle ? 'text-gray-700' : 'text-[#ddd]';
-  const titleColor = isBle ? 'text-black' : 'text-white';
+  const excerptColor = darkBg
+    ? 'text-gray-300'
+    : isBle
+      ? 'text-gray-700'
+      : 'text-[#ddd]';
+  const titleColor = darkBg
+    ? 'text-white'
+    : isBle
+      ? 'text-black'
+      : 'text-white';
 
   return (
     <div className="flex-shrink-0 w-80 w-full group">
@@ -39,7 +50,11 @@ export default function ArticlePreview({
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
-              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
+              <div
+                className={`absolute inset-0 transition-opacity duration-200 pointer-events-none ${
+                  darkBg ? 'bg-white opacity-0 group-hover:opacity-10' : 'bg-white opacity-0 group-hover:opacity-20'
+                }`}
+              />
             </div>
           )}
           <div className="">

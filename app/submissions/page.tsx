@@ -1,7 +1,100 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import {
+  fetchPageBySlug,
+  type SubmissionsPageACF,
+} from '../lib/wordpress';
+import { sanitizeHtmlWithBreaks, stripHtml } from '../lib/sanitize';
 
-export default function Submissions() {
+const SUBMISSIONS_FALLBACK: SubmissionsPageACF = {
+  page_title: 'Submit Your Content',
+  guidelines_heading: 'Submission Guidelines',
+  guidelines_text:
+    'We welcome submissions from creators, writers, and contributors who want to share their work with our community. Please review our guidelines before submitting your content. All submissions are reviewed by our editorial team and must meet our quality standards and community guidelines.',
+  content_types: [
+    {
+      type_name: 'Articles',
+      description:
+        'Well-researched articles on topics relevant to our community. Word count: 500-2000 words.',
+    },
+    {
+      type_name: 'Opinion Pieces',
+      description:
+        'Thoughtful commentary and analysis on current events or industry trends.',
+    },
+    {
+      type_name: 'Creative Writing',
+      description:
+        'Short stories, poetry, and other creative content that resonates with our audience.',
+    },
+    {
+      type_name: 'Visual Content',
+      description:
+        'Infographics, illustrations, and other visual content that enhances our platform.',
+    },
+  ],
+  requirements: [
+    'Content must be original and not previously published elsewhere',
+    'All sources must be properly cited and referenced',
+    'Content should be well-written, engaging, and relevant to our audience',
+    'Images and media must be properly licensed or original work',
+    'Submissions must comply with our community guidelines',
+    'Include a brief author bio with your submission',
+  ],
+  process_steps: [
+    {
+      step_number: 1,
+      title: 'Prepare Your Content',
+      description:
+        'Ensure your content meets our guidelines and is ready for submission.',
+    },
+    {
+      step_number: 2,
+      title: 'Submit Online',
+      description:
+        'Use our online submission form to upload your content and provide necessary information.',
+    },
+    {
+      step_number: 3,
+      title: 'Review Process',
+      description:
+        'Our editorial team will review your submission and provide feedback within 2-3 weeks.',
+    },
+    {
+      step_number: 4,
+      title: 'Publication',
+      description:
+        'If approved, your content will be published on our platform with proper attribution.',
+    },
+  ],
+  contact_heading: 'Questions?',
+  contact_email: 'submissions@byp.com',
+  contact_text:
+    "If you have any questions about our submission process or guidelines, please don't hesitate to contact us at submissions@byp.com. We're here to help you share your work with our community.",
+};
+
+function normalizeRequirements(
+  requirements?: string | string[]
+): string[] {
+  if (!requirements) return [];
+  if (Array.isArray(requirements)) return requirements;
+  return requirements
+    .split(/\n/)
+    .map((s) => s.replace(/^[-*]\s*/, '').trim())
+    .filter(Boolean);
+}
+
+export default async function Submissions() {
+  const wpPage = await fetchPageBySlug('submissions', {
+    acf_format: 'standard',
+  });
+  const acf = wpPage?.acf as SubmissionsPageACF | undefined;
+  const data: SubmissionsPageACF = acf
+    ? { ...SUBMISSIONS_FALLBACK, ...acf }
+    : SUBMISSIONS_FALLBACK;
+
+  const requirements = normalizeRequirements(data.requirements);
+
   return (
     <div className="min-h-screen bg-white w-full">
       <Header />
@@ -12,7 +105,7 @@ export default function Submissions() {
               className="text-3xl font-medium mb-8 py-8"
               style={{ fontFamily: 'Gill Sans' }}
             >
-              Submit Your Content
+              {stripHtml(data.page_title) || 'Submit Your Content'}
             </h1>
 
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
@@ -20,15 +113,15 @@ export default function Submissions() {
                 className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
-                Submission Guidelines
+                {stripHtml(data.guidelines_heading) || 'Submission Guidelines'}
               </h3>
-              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                We welcome submissions from creators, writers, and contributors
-                who want to share their work with our community. Please review
-                our guidelines before submitting your content. All submissions
-                are reviewed by our editorial team and must meet our quality
-                standards and community guidelines.
-              </p>
+              <div
+                className="text-xl [&_a]:underline [&_a:hover]:no-underline [&_p]:mb-4 [&_p:last-child]:mb-0"
+                style={{ fontFamily: 'Playfair' }}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtmlWithBreaks(data.guidelines_text),
+                }}
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-[1fr_3fr] gap-4 mb-8">
@@ -39,54 +132,23 @@ export default function Submissions() {
                 Content Types We Accept
               </h3>
               <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Articles
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Well-researched articles on topics relevant to our
-                    community. Word count: 500-2000 words.
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Opinion Pieces
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Thoughtful commentary and analysis on current events or
-                    industry trends.
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Creative Writing
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Short stories, poetry, and other creative content that
-                    resonates with our audience.
-                  </p>
-                </div>
-                <div>
-                  <h4
-                    className="text-lg font-medium mb-2"
-                    style={{ fontFamily: 'Gill Sans' }}
-                  >
-                    Visual Content
-                  </h4>
-                  <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Infographics, illustrations, and other visual content that
-                    enhances our platform.
-                  </p>
-                </div>
+                {(data.content_types ?? []).map((ct, i) => (
+                  <div key={i}>
+                    <h4
+                      className="text-lg font-medium mb-2"
+                      style={{ fontFamily: 'Gill Sans' }}
+                    >
+                      {stripHtml(ct.type_name)}
+                    </h4>
+                    <div
+                      className="text-xl [&_a]:underline [&_a:hover]:no-underline [&_p]:mb-4 [&_p:last-child]:mb-0"
+                      style={{ fontFamily: 'Playfair' }}
+                      dangerouslySetInnerHTML={{
+                        __html: sanitizeHtmlWithBreaks(ct.description),
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -99,26 +161,15 @@ export default function Submissions() {
               </h3>
               <div className="bg-gray-100 rounded-lg p-6">
                 <ul className="list-disc list-inside space-y-2">
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Content must be original and not previously published
-                    elsewhere
-                  </li>
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    All sources must be properly cited and referenced
-                  </li>
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Content should be well-written, engaging, and relevant to
-                    our audience
-                  </li>
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Images and media must be properly licensed or original work
-                  </li>
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Submissions must comply with our community guidelines
-                  </li>
-                  <li className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                    Include a brief author bio with your submission
-                  </li>
+                  {requirements.map((item, i) => (
+                    <li
+                      key={i}
+                      className="text-xl"
+                      style={{ fontFamily: 'Playfair' }}
+                    >
+                      {stripHtml(item)}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -131,74 +182,31 @@ export default function Submissions() {
                 Submission Process
               </h3>
               <div className="space-y-4">
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                    1
+                {(data.process_steps ?? []).map((step, i) => (
+                  <div
+                    key={i}
+                    className="flex items-start space-x-4"
+                  >
+                    <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                      {step.step_number ?? i + 1}
+                    </div>
+                    <div>
+                      <h4
+                        className="text-lg font-medium mb-1"
+                        style={{ fontFamily: 'Gill Sans' }}
+                      >
+                        {stripHtml(step.title)}
+                      </h4>
+                      <div
+                        className="text-xl [&_a]:underline [&_a:hover]:no-underline [&_p]:mb-4 [&_p:last-child]:mb-0"
+                        style={{ fontFamily: 'Playfair' }}
+                        dangerouslySetInnerHTML={{
+                          __html: sanitizeHtmlWithBreaks(step.description),
+                        }}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <h4
-                      className="text-lg font-medium mb-1"
-                      style={{ fontFamily: 'Gill Sans' }}
-                    >
-                      Prepare Your Content
-                    </h4>
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                      Ensure your content meets our guidelines and is ready for
-                      submission.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                    2
-                  </div>
-                  <div>
-                    <h4
-                      className="text-lg font-medium mb-1"
-                      style={{ fontFamily: 'Gill Sans' }}
-                    >
-                      Submit Online
-                    </h4>
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                      Use our online submission form to upload your content and
-                      provide necessary information.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                    3
-                  </div>
-                  <div>
-                    <h4
-                      className="text-lg font-medium mb-1"
-                      style={{ fontFamily: 'Gill Sans' }}
-                    >
-                      Review Process
-                    </h4>
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                      Our editorial team will review your submission and provide
-                      feedback within 2-3 weeks.
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                    4
-                  </div>
-                  <div>
-                    <h4
-                      className="text-lg font-medium mb-1"
-                      style={{ fontFamily: 'Gill Sans' }}
-                    >
-                      Publication
-                    </h4>
-                    <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                      If approved, your content will be published on our
-                      platform with proper attribution.
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 
@@ -207,14 +215,15 @@ export default function Submissions() {
                 className="text-xl font-medium"
                 style={{ fontFamily: 'Gill Sans' }}
               >
-                Questions?
+                {stripHtml(data.contact_heading) || 'Questions?'}
               </h3>
-              <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
-                If you have any questions about our submission process or
-                guidelines, please don&apos;t hesitate to contact us at
-                submissions@byp.com. We&apos;re here to help you share your work
-                with our community.
-              </p>
+              <div
+                className="text-xl [&_a]:underline [&_a:hover]:no-underline [&_p]:mb-4 [&_p:last-child]:mb-0"
+                style={{ fontFamily: 'Playfair' }}
+                dangerouslySetInnerHTML={{
+                  __html: sanitizeHtmlWithBreaks(data.contact_text),
+                }}
+              />
             </div>
           </section>
         </div>

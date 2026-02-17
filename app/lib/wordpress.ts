@@ -83,6 +83,78 @@ export interface WordPressPage {
   slug: string;
   date: string;
   modified: string;
+  acf?: Record<string, unknown>;
+}
+
+// ACF types for static pages (Contact, About, Submissions, Get Involved)
+
+export interface ContactPageACF {
+  page_title?: string;
+  get_in_touch_heading?: string;
+  get_in_touch_text?: string;
+  contact_email?: string;
+  contact_info_heading?: string;
+  address_lines?: string | string[];
+  faq_items?: Array<{ question?: string; answer?: string }>;
+}
+
+export interface AboutTeamMember {
+  name?: string;
+  bio?: string;
+  image?: { url?: string; id?: number } | string;
+}
+
+export interface AboutHistorySection {
+  title?: string;
+  content?: string;
+}
+
+export interface AboutPageACF {
+  hero_title?: string;
+  hero_subtitle?: string;
+  main_content?: string;
+  hero_image?: { url?: string; id?: number } | string;
+  team_members?: AboutTeamMember[];
+  history_sections?: AboutHistorySection[];
+  history_cta_text?: string;
+  history_cta_url?: string;
+}
+
+export interface SubmissionsContentType {
+  type_name?: string;
+  description?: string;
+}
+
+export interface SubmissionsProcessStep {
+  step_number?: number;
+  title?: string;
+  description?: string;
+}
+
+export interface SubmissionsPageACF {
+  page_title?: string;
+  guidelines_heading?: string;
+  guidelines_text?: string;
+  content_types?: SubmissionsContentType[];
+  requirements?: string | string[];
+  process_steps?: SubmissionsProcessStep[];
+  contact_heading?: string;
+  contact_email?: string;
+  contact_text?: string;
+}
+
+export interface GetInvolvedPageACF {
+  page_title?: string;
+  hero_image?: { url?: string; id?: number } | string;
+  intro_heading?: string;
+  intro_text?: string;
+  pitch_heading?: string;
+  pitch_text?: string;
+  pitch_email?: string;
+  republish_heading?: string;
+  republish_text?: string;
+  republish_email?: string;
+  submissions_link?: string;
 }
 
 export interface WordPressCategory {
@@ -121,6 +193,11 @@ export interface PageResults {
   per_page?: number;
   page?: number;
   _embed?: boolean;
+}
+
+export interface PostsWithTotal {
+  posts: WordPressPost[];
+  total: number;
 }
 
 export interface BLEIssue {
@@ -312,6 +389,154 @@ export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
 }
 
 /**
+ * Fetch a single tag by slug from WordPress API
+ * @param slug - Tag slug (e.g. "justice")
+ * @returns Promise<WordPressTag | null>
+ */
+export async function fetchTagBySlug(slug: string): Promise<WordPressTag | null> {
+  if (!slug?.trim()) return null;
+  try {
+    const params = new URLSearchParams({
+      slug: slug.trim(),
+      per_page: '1',
+      _fields: 'id,name,slug,description,count,taxonomy',
+    });
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/tags?${params.toString()}`,
+      { next: { revalidate: 300 } }
+    );
+    if (!response.ok) return null;
+    const list = await response.json();
+    return Array.isArray(list) && list.length > 0 ? (list[0] as WordPressTag) : null;
+  } catch (error) {
+    console.error('Error fetching tag by slug:', error);
+    return null;
+  }
+}
+
+/**
+ * Fetch posts that have a given tag (by slug)
+ */
+export async function fetchPostsByTagSlug(
+  slug: string,
+  params: { per_page?: number; page?: number } = {}
+): Promise<PostsWithTotal> {
+  const tag = await fetchTagBySlug(slug);
+  if (!tag) return { posts: [], total: 0 };
+  const { per_page = 12, page = 1 } = params;
+  const searchParams = new URLSearchParams({
+    tags: String(tag.id),
+    per_page: String(per_page),
+    page: String(page),
+    orderby: 'date',
+    order: 'desc',
+    _fields: [
+      'id',
+      'slug',
+      'title.rendered',
+      'excerpt.rendered',
+      'date',
+      'jetpack_featured_media_url',
+      'author',
+      'categories',
+      'tags',
+      'hero_media',
+      'hero_media_url',
+      'hero_media_embed_html',
+      'hero_media_external_url',
+    ].join(','),
+  });
+  const res = await fetch(`${WORDPRESS_API_URL}/posts?${searchParams.toString()}`, {
+    next: { revalidate: 300 },
+  });
+  if (!res.ok) return { posts: [], total: 0 };
+  const posts = await res.json();
+  const total = parseInt(res.headers.get('X-WP-Total') ?? '0', 10) || posts.length;
+  return { posts, total };
+}
+
+/**
+ * Search posts by text (title, content, excerpt) via WordPress REST API
+ */
+export async function fetchPostsSearch(
+  query: string,
+  params: { per_page?: number; page?: number } = {}
+): Promise<PostsWithTotal> {
+  if (!query?.trim()) return { posts: [], total: 0 };
+  const { per_page = 12, page = 1 } = params;
+  const searchParams = new URLSearchParams({
+    search: query.trim(),
+    per_page: String(per_page),
+    page: String(page),
+    orderby: 'relevance',
+    _fields: [
+      'id',
+      'slug',
+      'title.rendered',
+      'excerpt.rendered',
+      'date',
+      'jetpack_featured_media_url',
+      'author',
+      'categories',
+      'tags',
+      'hero_media',
+      'hero_media_url',
+      'hero_media_embed_html',
+      'hero_media_external_url',
+    ].join(','),
+  });
+  const res = await fetch(`${WORDPRESS_API_URL}/posts?${searchParams.toString()}`, {
+    next: { revalidate: 300 },
+  });
+  if (!res.ok) return { posts: [], total: 0 };
+  const posts = await res.json();
+  const total = parseInt(res.headers.get('X-WP-Total') ?? '0', 10) || posts.length;
+  return { posts, total };
+}
+
+/**
+ * Fetch posts that match both a tag (by slug) and a text search
+ */
+export async function fetchPostsSearchWithTag(
+  tagSlug: string,
+  query: string,
+  params: { per_page?: number; page?: number } = {}
+): Promise<PostsWithTotal> {
+  const tag = await fetchTagBySlug(tagSlug);
+  if (!tag || !query?.trim()) return { posts: [], total: 0 };
+  const { per_page = 12, page = 1 } = params;
+  const searchParams = new URLSearchParams({
+    tags: String(tag.id),
+    search: query.trim(),
+    per_page: String(per_page),
+    page: String(page),
+    orderby: 'relevance',
+    _fields: [
+      'id',
+      'slug',
+      'title.rendered',
+      'excerpt.rendered',
+      'date',
+      'jetpack_featured_media_url',
+      'author',
+      'categories',
+      'tags',
+      'hero_media',
+      'hero_media_url',
+      'hero_media_embed_html',
+      'hero_media_external_url',
+    ].join(','),
+  });
+  const res = await fetch(`${WORDPRESS_API_URL}/posts?${searchParams.toString()}`, {
+    next: { revalidate: 300 },
+  });
+  if (!res.ok) return { posts: [], total: 0 };
+  const posts = await res.json();
+  const total = parseInt(res.headers.get('X-WP-Total') ?? '0', 10) || posts.length;
+  return { posts, total };
+}
+
+/**
  * Fetch categories from WordPress API
  * @returns Promise<WordPressCategory[]>
  */
@@ -367,6 +592,40 @@ export async function fetchPages(
   } catch (error) {
     console.error('Error fetching pages:', error);
     return [];
+  }
+}
+
+/**
+ * Fetch a single page by slug from WordPress API (with ACF support)
+ * @param slug - Page slug (e.g. "contact", "about", "submissions", "get-involved")
+ * @param options - Optional fetch options (acf_format for ACF fields)
+ * @returns Promise<WordPressPage | null>
+ */
+export async function fetchPageBySlug(
+  slug: string,
+  options?: { acf_format?: 'standard' }
+): Promise<WordPressPage | null> {
+  if (!slug?.trim()) return null;
+  try {
+    const searchParams = new URLSearchParams({
+      slug: slug.trim(),
+      per_page: '1',
+    });
+    if (options?.acf_format === 'standard') {
+      searchParams.append('acf_format', 'standard');
+    }
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/pages?${searchParams.toString()}`,
+      {
+        next: { revalidate: 300 }, // Cache for 5 minutes
+      }
+    );
+    if (!response.ok) return null;
+    const pages: WordPressPage[] = await response.json();
+    return Array.isArray(pages) && pages.length > 0 ? pages[0] : null;
+  } catch (error) {
+    console.error('Error fetching page by slug:', error);
+    return null;
   }
 }
 

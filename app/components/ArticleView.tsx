@@ -150,7 +150,11 @@ export default function ArticleView({ slug }: ArticleViewProps) {
             {tags.length > 0 && (
               <div className="flex justify-center items-center flex-wrap gap-2 mb-6">
                 {tags.map(tag => (
-                  <Tag key={tag.id} label={tag.name.toUpperCase()} />
+                  <Tag
+                    key={tag.id}
+                    label={tag.name.toUpperCase()}
+                    slug={tag.slug}
+                  />
                 ))}
               </div>
             )}
