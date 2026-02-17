@@ -103,59 +103,68 @@ export default function Header({ slug }: HeaderProps) {
               </Link>
             </div>
 
-            {/* Desktop: nav links OR search bar + close (single slot, no ghost space) */}
-            <div
-              className={`hidden lg:flex items-center flex-1 min-w-0 justify-end min-h-[44px]`}
-            >
-              {isSearchOpen ? (
-                <div className="flex items-center gap-2 border-b border-white/30 focus-within:border-white/60 transition-colors py-2.5">
-                  {searchForm}
-                  <button
-                    onClick={closeSearch}
-                    className="p-1.5 text-white/80 hover:text-white transition-colors shrink-0"
-                    aria-label="Close search"
-                  >
-                    <Image src="/img/x.svg" alt="" width={20} height={20} className="filter-white" />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <nav className="flex space-x-8 items-center shrink-0 py-2.5">
-                    {navLinks.map((link, index) => (
-                      <Link
-                        key={`${link.href}-${index}`}
-                        href={link.href}
-                        className="hover:text-gray-300 whitespace-nowrap uppercase"
-                        style={{
-                          position: 'relative',
-                          top: '3px',
-                          fontFamily: 'Gill Sans',
-                          fontWeight: '500',
-                        }}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
+            {/* Desktop: nav links OR search bar + close (single slot, animated) */}
+            <div className="relative hidden lg:flex items-center flex-1 min-w-0 justify-end min-h-[44px]">
+              {/* Nav links + search icon — slides out left when search opens */}
+              <div
+                className={`absolute right-0 flex items-center py-2.5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                  isSearchOpen
+                    ? 'opacity-0 -translate-x-4 pointer-events-none'
+                    : 'opacity-100 translate-x-0 pointer-events-auto'
+                }`}
+              >
+                <nav className="flex space-x-8 items-center shrink-0">
+                  {navLinks.map((link, index) => (
                     <Link
-                      href="https://giving.uchicago.edu/site/Donation2?df_id=1714&mfc_pref=T&1714.donation=form1"
-                      className="bg-[#e71b23] text-white px-4 pt-2 pb-1 rounded-lg hover:bg-byp-red-dark flex items-center justify-center"
+                      key={`${link.href}-${index}`}
+                      href={link.href}
+                      className="hover:text-gray-300 whitespace-nowrap uppercase"
                       style={{
+                        position: 'relative',
+                        top: '3px',
                         fontFamily: 'Gill Sans',
                         fontWeight: '500',
                       }}
                     >
-                      DONATE
+                      {link.label}
                     </Link>
-                  </nav>
-                  <button
-                    onClick={() => setIsSearchOpen(true)}
-                    className="p-2 ml-6 text-white/80 hover:text-white transition-colors shrink-0"
-                    aria-label="Open search"
+                  ))}
+                  <Link
+                    href="https://giving.uchicago.edu/site/Donation2?df_id=1714&mfc_pref=T&1714.donation=form1"
+                    className="bg-[#e71b23] text-white px-4 pt-2 pb-1 rounded-lg hover:bg-byp-red-dark flex items-center justify-center"
+                    style={{
+                      fontFamily: 'Gill Sans',
+                      fontWeight: '500',
+                    }}
                   >
-                    <Image src="/img/search.svg" alt="" width={24} height={24} />
-                  </button>
-                </>
-              )}
+                    DONATE
+                  </Link>
+                </nav>
+                <button
+                  onClick={() => setIsSearchOpen(true)}
+                  className="p-2 ml-6 text-white/80 hover:text-white transition-colors shrink-0"
+                  aria-label="Open search"
+                >
+                  <Image src="/img/search.svg" alt="" width={24} height={24} />
+                </button>
+              </div>
+              {/* Search bar — slides in from right when opened */}
+              <div
+                className={`absolute right-0 flex items-center gap-2 border-b border-white/30 focus-within:border-white/60 py-2.5 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                  isSearchOpen
+                    ? 'opacity-100 translate-x-0 pointer-events-auto'
+                    : 'opacity-0 translate-x-4 pointer-events-none'
+                }`}
+              >
+                {searchForm}
+                <button
+                  onClick={closeSearch}
+                  className="p-1.5 text-white/80 hover:text-white transition-colors shrink-0"
+                  aria-label="Close search"
+                >
+                  <Image src="/img/x.svg" alt="" width={20} height={20} className="filter-white" />
+                </button>
+              </div>
             </div>
 
             {/* Mobile: search icon opens menu and focuses search; menu button */}

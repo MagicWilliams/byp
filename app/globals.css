@@ -1,6 +1,23 @@
 @import "tailwindcss";
 
 @tailwind base;
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Magazine-style drop cap for About this issue (disabled when centered) */
+.about-issue-content:not(.about-issue-centered) p:first-of-type::first-letter {
+  font-size: 4.5rem;
+  float: left;
+  line-height: 0.85;
+  margin-right: 0.08em;
+  margin-top: -0.02em;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-weight: 700;
+  color: inherit;
+}
+
 @tailwind components;
 @tailwind utilities;
 

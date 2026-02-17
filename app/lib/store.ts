@@ -86,6 +86,53 @@ async function fetchPostsByTagName(
   return await res.json();
 }
 
+/** Fetch posts that have ANY of the given tag slugs. Merges, dedupes, sorts by date desc. */
+async function fetchPostsByTagSlugs(
+  tagSlugs: string[],
+  params: { per_page?: number } = {}
+): Promise<WordPressPost[]> {
+  const { per_page = 10 } = params;
+  const seenIds = new Set<number>();
+  const allPosts: WordPressPost[] = [];
+
+  for (const slug of tagSlugs) {
+    const slugified = slug.toLowerCase().replace(/\s+/g, '-');
+    const tagRes = await fetch(
+      `/api/tags?slug=${encodeURIComponent(slugified)}`
+    );
+    if (!tagRes.ok) continue;
+    const tags = await tagRes.json();
+    const targetTag = tags.find(
+      (t: WordPressTag) => t.slug === slugified
+    );
+    if (!targetTag) continue;
+
+    const query = new URLSearchParams();
+    query.append('tags', String(targetTag.id));
+    query.append('per_page', String(per_page * 2)); // Fetch extra to account for overlap
+    query.append('orderby', 'date');
+    query.append('order', 'desc');
+    query.append('_embed', '1');
+
+    const res = await fetch(`/api/posts?${query.toString()}`);
+    if (!res.ok) continue;
+    const posts: WordPressPost[] = await res.json();
+    for (const post of posts) {
+      if (!seenIds.has(post.id)) {
+        seenIds.add(post.id);
+        allPosts.push(post);
+      }
+    }
+  }
+
+  // Sort by date desc
+  allPosts.sort(
+    (a, b) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  return allPosts.slice(0, per_page);
+}
+
 async function fetchPostsByCategoryName(
   categoryName: string,
   params: {
@@ -187,6 +234,12 @@ interface SiteState {
   authorPostsLoading: Record<string, boolean>;
   authorPostsError: Record<string, string | null>;
 
+  // BLE "More from BLE" - posts tagged with BLE or Black Life Everywhere
+  bleMorePosts: WordPressPost[];
+  bleMorePostsLoading: boolean;
+  bleMorePostsError: string | null;
+  bleMorePostsLastFetched: number | null;
+
   postsLoading: boolean;
   categoriesLoading: boolean;
   tagsLoading: boolean;
@@ -272,6 +325,10 @@ interface SiteState {
   ) => Promise<WordPressUser | null>;
   fetchBlackLifeEverywhereIssues: (force?: boolean) => Promise<void>;
   fetchBLETags: (force?: boolean) => Promise<void>;
+  fetchBLEMorePosts: (params?: {
+    per_page?: number;
+    force?: boolean;
+  }) => Promise<void>;
 
   hydrateFromServer: (
     data: Partial<
@@ -332,6 +389,11 @@ export const useSiteStore = create<SiteState>()(
       authorPosts: {},
       authorPostsLoading: {},
       authorPostsError: {},
+
+      bleMorePosts: [],
+      bleMorePostsLoading: false,
+      bleMorePostsError: null,
+      bleMorePostsLastFetched: null,
 
       postsLoading: false,
       categoriesLoading: false,
@@ -861,6 +923,48 @@ export const useSiteStore = create<SiteState>()(
         }
       },
 
+      fetchBLEMorePosts: async (params = {}) => {
+        const { force = false, per_page = 8 } = params;
+        const state = get();
+
+        if (
+          !force &&
+          state.bleMorePosts.length > 0 &&
+          !isDataStale(state.bleMorePostsLastFetched)
+        ) {
+          return;
+        }
+
+        set({ bleMorePostsLoading: true, bleMorePostsError: null });
+        try {
+          let posts = await fetchPostsByTagSlugs(
+            ['ble', 'black-life-everywhere'],
+            { per_page }
+          );
+          // Fallback to category if no tag results
+          if (posts.length === 0) {
+            posts = await fetchPostsByCategoryName('blacklifeeverywhere', {
+              per_page,
+              page: 1,
+            });
+          }
+          set({
+            bleMorePosts: posts,
+            bleMorePostsLoading: false,
+            bleMorePostsError: null,
+            bleMorePostsLastFetched: Date.now(),
+          });
+        } catch (error) {
+          set({
+            bleMorePostsError:
+              error instanceof Error
+                ? error.message
+                : 'Failed to fetch BLE articles',
+            bleMorePostsLoading: false,
+          });
+        }
+      },
+
       hydrateFromServer: data => {
         set(state => ({
           posts: data.posts ?? state.posts,
@@ -915,6 +1019,7 @@ export const useSiteStore = create<SiteState>()(
           authorsError: null,
           bleIssuesError: null,
           bleTagsError: null,
+          bleMorePostsError: null,
         }),
       clearCategoryPosts: (categoryId?: number) => {
         if (categoryId) {

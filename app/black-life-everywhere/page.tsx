@@ -1,9 +1,9 @@
-import Image from 'next/image';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { fetchBlackLifeEverywhereIssues } from '../lib/wordpress';
 import IssuesGrid from '../components/IssuesGrid';
 import NewestArticles from '../components/NewestArticles';
+import BLEHero from '../components/BLEHero';
 
 export default async function BlackLifeEverywhere() {
   const bleIssues = await fetchBlackLifeEverywhereIssues();
@@ -13,78 +13,8 @@ export default async function BlackLifeEverywhere() {
       <Header slug="BLE" />
 
       <main>
-        {/* Hero Section */}
-        {bleIssues.length > 0 && (
-          <section className="relative overflow-hidden md:py-12 lg:py-16">
-            {/* Background Image with Overlay */}
-            {bleIssues[0].featured_image_url && (
-              <>
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: `url(${bleIssues[0].featured_image_url})`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/80" />
-              </>
-            )}
-
-            {/* Content */}
-            <div className="relative z-10 p-4 md:p-8 max-w-7xl mx-auto">
-              <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-                {/* Right Column (Image) - appears first on mobile */}
-                {bleIssues[0].featured_image_url && (
-                  <div className="flex-1 flex items-center justify-center order-1 lg:order-2 mb-6 lg:mb-0">
-                    <Image
-                      src={bleIssues[0].featured_image_url}
-                      alt={bleIssues[0].title.rendered}
-                      className="shadow-lg object-cover w-full h-auto"
-                      width={1000}
-                      height={1000}
-                    />
-                  </div>
-                )}
-                {/* Left Column - appears after image on mobile */}
-                <div className="flex-1 flex flex-col justify-center order-2 lg:order-1">
-                  <span
-                    className="text-gray-400 text-lg mb-2 font-serif"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
-                  >
-                    Latest Edition
-                  </span>
-                  <h1
-                    className="text-3xl md:text-4xl font-bold mb-2 text-white"
-                    style={{
-                      fontFamily:
-                        'Gill Sans, GillSans, Gill Sans MT, Calibri, sans-serif',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    {bleIssues[0].title.rendered}
-                  </h1>
-                  <span
-                    className="text-gray-400 text-base mb-4 font-serif"
-                    style={{ fontFamily: 'Playfair Display, serif' }}
-                  >
-                    {new Date(bleIssues[0].date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                    })}
-                  </span>
-                  <div
-                    className="text-white text-base mb-6 w-[80%]"
-                    dangerouslySetInnerHTML={{
-                      __html: bleIssues[0].content.rendered,
-                    }}
-                  />
-                  <button className="bg-purple-700 hover:bg-purple-800 text-white px-6 py-2 rounded font-medium transition-colors w-fit">
-                    Read More
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+        {/* Magazine Cover Hero */}
+        {bleIssues.length > 0 && <BLEHero issue={bleIssues[0]} />}
 
         {/* Issues Grid (Client Component) */}
         {bleIssues.length > 0 && <IssuesGrid issues={bleIssues} />}

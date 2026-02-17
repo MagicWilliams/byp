@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import BLEArticlePreview from './BLEArticlePreview';
@@ -6,6 +8,7 @@ import { BLEAssociatedPost, BLEIssue } from '../lib/wordpress';
 interface IssueProps {
   issue: BLEIssue;
   index: number;
+  isLatest: boolean;
   collapsed: boolean;
   onToggle: () => void;
 }
@@ -51,96 +54,197 @@ const makeColorBrighter = (color: string): string => {
   return color;
 };
 
-const Issue: React.FC<IssueProps> = ({ issue, index, collapsed, onToggle }) => {
+const Issue: React.FC<IssueProps> = ({
+  issue,
+  index,
+  isLatest,
+  collapsed,
+  onToggle,
+}) => {
   const { gradientstart, gradientend } = issue.acf;
   const gradient = `linear-gradient(to right, ${gradientstart}, ${gradientend})`;
   const brighterBackground = makeColorBrighter(gradientstart);
+  const dateStr = new Date(issue.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+  });
 
   return (
     <div
       className="overflow-hidden"
       style={{ background: brighterBackground }}
       key={index}
+      id={isLatest ? 'latest-issue' : undefined}
     >
-      {/* Issue Header (toggle) */}
-      <div className="p-8" style={{ background: gradient }}>
-        <div className="flex items-center justify-between">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-white pt-2"
-            style={{ fontFamily: 'Gill Sans', fontWeight: 'bold' }}
-          >
-            {issue.title.rendered}
-          </h2>
-          <Image
-            src="/img/issue-arrow.svg"
-            alt="Toggle articles"
-            className={`w-8 h-8 ml-4 cursor-pointer transition-transform duration-300 ${
-              collapsed ? 'rotate-180' : ''
-            }`}
-            onClick={onToggle}
-            width={32}
-            height={32}
-          />
-        </div>
-      </div>
-
-      {/* Collapsible Section */}
-      <div
-        className={`transition-all duration-500 overflow-hidden ${
-          collapsed ? 'max-h-0 opacity-0' : 'opacity-100'
-        }`}
-        style={{ transitionProperty: 'max-height, opacity' }}
-      >
-        {/* Featured Image */}
-        {issue.featured_image_url && (
-          <div className="w-full h-full flex justify-center items-center">
-            <Image
-              src={issue.featured_image_url}
-              alt={issue.title.rendered}
-              className="object-contain w-full"
-              style={{ background: '#222' }}
-              width={1000}
-              height={1000}
-            />
-          </div>
-        )}
-        {/* Placeholder Caption */}
-        <div className="text-xs text-gray-600 px-6 text-left mt-4 mb-8 max-w-7xl mx-auto">
-          Photo Credit: Placeholder Caption
-        </div>
-
-        {/* About Issue */}
-        <div className="max-w-7xl mx-auto px-6 md:py-6">
-          <h3
-            className="text-2xl md:text-3xl mb-2 text-black"
-            style={{ fontFamily: 'Gill Sans', fontWeight: 500 }}
-          >
-            About {issue.title.rendered}
-          </h3>
-          <div
-            className="text-black text-xl mb-8"
-            style={{ fontFamily: 'Gill Sans' }}
-            dangerouslySetInnerHTML={{ __html: issue.content.rendered }}
-          />
-        </div>
-
-        {/* Table of Contents */}
-        <div className="bg-white p-6 lg:py-12">
-          <h4
-            className="text-2xl md:text-3xl mb-8 text-black max-w-7xl mx-auto"
-            style={{ fontFamily: 'Gill Sans', fontWeight: 500 }}
-          >
-            Table of Contents
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 text-black max-w-7xl mx-auto">
-            {issue.acf.associated_posts.map(
-              (post: BLEAssociatedPost, idx: number) => (
-                <BLEArticlePreview key={post.ID} post={post} idx={idx} />
-              )
+      {/* Collapsed: Magazine cover style */}
+      {collapsed ? (
+        <button
+          type="button"
+          onClick={onToggle}
+          className="w-full text-left block group focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+        >
+          <div className="relative aspect-[4/3] md:aspect-[21/9] overflow-hidden">
+            {issue.featured_image_url ? (
+              <Image
+                src={issue.featured_image_url}
+                alt={issue.title.rendered}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+            ) : (
+              <div
+                className="absolute inset-0"
+                style={{ background: gradient }}
+              />
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+              <span
+                className="text-white/80 text-xs uppercase tracking-[0.2em] mb-1 block"
+                style={{ fontFamily: 'Gill Sans' }}
+              >
+                Issue
+              </span>
+              <h2
+                className="text-2xl md:text-4xl lg:text-5xl font-bold text-white"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                {issue.title.rendered}
+              </h2>
+              <span
+                className="text-white/90 text-sm md:text-base mt-2 block"
+                style={{ fontFamily: 'Playfair Display, serif' }}
+              >
+                {dateStr}
+              </span>
+            </div>
+            <div className="absolute top-4 right-4 md:top-6 md:right-6">
+              <Image
+                src="/img/issue-arrow.svg"
+                alt="Expand"
+                className="w-8 h-8 rotate-[-90deg] opacity-80 group-hover:opacity-100 transition-opacity"
+                width={32}
+                height={32}
+              />
+            </div>
           </div>
-        </div>
-      </div>
+        </button>
+      ) : (
+        <>
+          {/* Expanded: Header with toggle */}
+          <div className="p-8" style={{ background: gradient }}>
+            <div className="flex items-center justify-between">
+              <h2
+                className="text-3xl md:text-4xl font-bold text-white pt-2"
+                style={{ fontFamily: 'Gill Sans', fontWeight: 'bold' }}
+              >
+                {issue.title.rendered}
+              </h2>
+              <button
+                type="button"
+                onClick={onToggle}
+                className="p-2 -m-2 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-white rounded"
+              >
+                <Image
+                  src="/img/issue-arrow.svg"
+                  alt="Collapse"
+                  className="w-8 h-8 rotate-180"
+                  width={32}
+                  height={32}
+                />
+              </button>
+            </div>
+          </div>
+
+          {/* Expanded content */}
+          <div className="overflow-hidden">
+            {/* Featured Image */}
+            {issue.featured_image_url && (
+              <div className="w-full h-full flex justify-center items-center">
+                <Image
+                  src={issue.featured_image_url}
+                  alt={issue.title.rendered}
+                  className="object-contain w-full"
+                  style={{ background: '#222' }}
+                  width={1000}
+                  height={1000}
+                />
+              </div>
+            )}
+            {/* Placeholder Caption */}
+            <div className="text-xs text-gray-600 px-6 text-left mt-4 mb-8 max-w-7xl mx-auto">
+              Photo Credit: Placeholder Caption
+            </div>
+
+            {/* About Issue - Centered layout */}
+            <div
+              className="max-w-7xl mx-auto px-6 md:px-12 md:py-4 mb-8"
+              style={{ background: brighterBackground }}
+            >
+              <div className="flex flex-col items-center text-center">
+                <span
+                  className="text-xs uppercase tracking-[0.25em] text-black/60 mb-3 block"
+                  style={{ fontFamily: 'Gill Sans' }}
+                >
+                  In this issue
+                </span>
+                <h3
+                  className="text-2xl md:text-3xl mb-6 text-black"
+                  style={{
+                    fontFamily: 'Playfair Display, serif',
+                    fontWeight: 600,
+                  }}
+                >
+                  About {issue.title.rendered}
+                </h3>
+                <div
+                  className="about-issue-content about-issue-centered text-black text-lg md:text-xl leading-relaxed w-full max-w-[75%] mx-auto"
+                  style={{
+                    fontFamily: 'Playfair Display, Georgia, serif',
+                    textAlign: 'center',
+                  }}
+                  dangerouslySetInnerHTML={{ __html: issue.content.rendered }}
+                />
+              </div>
+            </div>
+
+            {/* Table of Contents - Tiered layout: cover, featured, standard, compact */}
+            <div
+              className="bg-white p-6 lg:py-12"
+              id={isLatest ? 'table-of-contents' : undefined}
+            >
+              <h4
+                className="text-2xl md:text-3xl mb-8 text-black max-w-7xl mx-auto"
+                style={{ fontFamily: 'Gill Sans', fontWeight: 500 }}
+              >
+                Table of Contents
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 text-black max-w-7xl mx-auto">
+                {issue.acf.associated_posts.map(
+                  (post: BLEAssociatedPost, idx: number) => {
+                    const size =
+                      idx === 0
+                        ? 'cover'
+                        : idx <= 2
+                          ? 'featured'
+                          : idx <= 5
+                            ? 'standard'
+                            : 'compact';
+                    return (
+                      <BLEArticlePreview
+                        key={post.ID}
+                        post={post}
+                        idx={idx}
+                        size={size}
+                      />
+                    );
+                  },
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

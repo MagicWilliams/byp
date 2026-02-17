@@ -51,21 +51,32 @@ function ArticlePreviewSkeleton({ isBle = false }: { isBle?: boolean }) {
 }
 
 export default function NewestArticles({ page }: NewestArticlesProps) {
-  const { posts, postsLoading, postsError, fetchPostsByCategoryName } =
-    useSiteStore();
+  const isBle = page === 'ble';
+  const {
+    posts,
+    postsLoading,
+    postsError,
+    bleMorePosts,
+    bleMorePostsLoading,
+    bleMorePostsError,
+    fetchBLEMorePosts,
+  } = useSiteStore();
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const displayPosts = isBle ? bleMorePosts : posts;
+  const displayLoading = isBle ? bleMorePostsLoading : postsLoading;
+  const displayError = isBle ? bleMorePostsError : postsError;
+
   useEffect(() => {
-    // If page is "ble", fetch posts in the "blacklifeeverywhere" category
-    if (page === 'ble') {
-      fetchPostsByCategoryName('blacklifeeverywhere', { per_page: 5, page: 1 });
+    if (isBle) {
+      fetchBLEMorePosts({ per_page: 8 });
     }
     // For standard behavior, we don't need to fetch posts here
     // The main page already fetches all posts, and we'll slice them on the frontend
-  }, [fetchPostsByCategoryName, page]);
+  }, [fetchBLEMorePosts, isBle]);
 
   const startScrolling = () => {
     if (!scrollContainerRef.current) return;
@@ -105,45 +116,45 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
   return (
     <section
       className={`py-8 border-t-2 ${
-        page === 'ble'
+        isBle
           ? 'bg-white text-black px-4 sm:px-6 lg:px-8 py-12'
           : 'border-white'
       }`}
     >
       <h2
         className={`text-2xl text-left mb-8 font-medium ${
-          page === 'ble' ? 'text-black' : 'text-white'
+          isBle ? 'text-black' : 'text-white'
         }`}
         style={{ fontFamily: 'Gill Sans' }}
       >
-        Newest Articles
+        {isBle ? 'More from BLE' : 'Newest Articles'}
       </h2>
       <div
         ref={scrollContainerRef}
         className="flex overflow-x-auto space-x-8 pb-4 scroll-smooth"
       >
-        {postsLoading ? (
+        {displayLoading ? (
           // Show skeleton loaders while loading
-          Array.from({ length: 5 }).map((_, index) => (
-            <ArticlePreviewSkeleton key={index} isBle={page === 'ble'} />
+          Array.from({ length: isBle ? 8 : 5 }).map((_, index) => (
+            <ArticlePreviewSkeleton key={index} isBle={isBle} />
           ))
-        ) : postsError ? (
-          <div>Error loading articles: {postsError}</div>
+        ) : displayError ? (
+          <div>Error loading articles: {displayError}</div>
         ) : (
           // Show actual articles when loaded
-          posts.slice(0, 5).map(post => (
+          displayPosts.slice(0, isBle ? 8 : 5).map(post => (
             <div
               className="w-[66%] md:w-[32%] max-w-sm flex-shrink-0"
               key={post.id}
             >
-              <ArticlePreview post={post} isBle={page === 'ble'} />
+              <ArticlePreview post={post} isBle={isBle} />
             </div>
           ))
         )}
       </div>
       <div className="flex justify-end">
         <Image
-          src={page === 'ble' ? '/img/arrow-black.svg' : '/img/arrow.svg'}
+          src={isBle ? '/img/arrow-black.svg' : '/img/arrow.svg'}
           alt="Scroll to the right for additional articles."
           width={50}
           height={33}
