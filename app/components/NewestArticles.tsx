@@ -4,9 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
 import Image from 'next/image';
+import type { WordPressPost } from '../lib/wordpress';
 
 interface NewestArticlesProps {
   page?: string;
+  /** When provided (e.g. on homepage), use this list instead of store posts (e.g. to exclude BLE). */
+  postsOverride?: WordPressPost[];
 }
 
 // Skeleton component for article previews
@@ -50,7 +53,10 @@ function ArticlePreviewSkeleton({ isBle = false }: { isBle?: boolean }) {
   );
 }
 
-export default function NewestArticles({ page }: NewestArticlesProps) {
+export default function NewestArticles({
+  page,
+  postsOverride,
+}: NewestArticlesProps) {
   const isBle = page === 'ble';
   const {
     posts,
@@ -66,7 +72,9 @@ export default function NewestArticles({ page }: NewestArticlesProps) {
   const [isScrolling, setIsScrolling] = useState(false);
   const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const displayPosts = isBle ? bleMorePosts : posts;
+  const displayPosts = isBle
+    ? bleMorePosts
+    : (postsOverride !== undefined ? postsOverride : posts);
   const displayLoading = isBle ? bleMorePostsLoading : postsLoading;
   const displayError = isBle ? bleMorePostsError : postsError;
 

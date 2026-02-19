@@ -175,6 +175,54 @@ export interface WordPressTag {
   taxonomy: 'post_tag';
 }
 
+/** BLE tag slugs and category slug used to identify Black Life Everywhere content */
+const BLE_TAG_SLUGS = ['ble', 'black-life-everywhere'];
+const BLE_CATEGORY_SLUG = 'blacklifeeverywhere';
+
+/**
+ * Returns true if the post is tagged with BLE or Black Life Everywhere (tag or category).
+ * Used to exclude these posts from the main homepage.
+ */
+export function isBLEPost(
+  post: WordPressPost,
+  context?: {
+    categories?: WordPressCategory[];
+    tags?: WordPressTag[];
+  }
+): boolean {
+  // Prefer embedded terms from API (_embed=true)
+  const embedded = post._embedded?.['wp:term'];
+  if (Array.isArray(embedded)) {
+    const terms = embedded.flat() as Array<{ slug?: string; taxonomy?: string }>;
+    const hasBLETag = terms.some(
+      t => t.taxonomy === 'post_tag' && t.slug && BLE_TAG_SLUGS.includes(t.slug)
+    );
+    const hasBLECategory = terms.some(
+      t =>
+        t.taxonomy === 'category' &&
+        t.slug === BLE_CATEGORY_SLUG
+    );
+    if (hasBLETag || hasBLECategory) return true;
+  }
+
+  // Fallback: use store categories/tags to resolve IDs
+  if (context?.categories) {
+    const bleCategory = context.categories.find(
+      c => c.slug === BLE_CATEGORY_SLUG
+    );
+    if (bleCategory && post.categories?.includes(bleCategory.id)) return true;
+  }
+  if (context?.tags) {
+    const bleTagIds = context.tags
+      .filter(t => t.slug && BLE_TAG_SLUGS.includes(t.slug))
+      .map(t => t.id);
+    if (bleTagIds.length && post.tags?.some(id => bleTagIds.includes(id)))
+      return true;
+  }
+
+  return false;
+}
+
 // New types for BLE Issue with associated posts
 export interface BLEAssociatedPost {
   ID: number;

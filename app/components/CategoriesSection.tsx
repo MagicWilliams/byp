@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
-import { WordPressCategory } from '../lib/wordpress';
+import { WordPressCategory, WordPressPost } from '../lib/wordpress';
 
 // Skeleton component for article previews in grid layout
 function ArticlePreviewSkeleton() {
@@ -32,8 +32,11 @@ function ArticlePreviewSkeleton() {
 
 export default function CategoriesSection({
   categories,
+  allPostsOverride,
 }: {
   categories: WordPressCategory[];
+  /** When provided (e.g. on homepage), use for "All" view page 1 instead of store posts (e.g. to exclude BLE). */
+  allPostsOverride?: WordPressPost[];
 }) {
   const {
     posts,
@@ -69,12 +72,20 @@ export default function CategoriesSection({
 
   const filteredPosts = useMemo(() => {
     if (!selectedCategory) {
-      // All categories: use page 1 from main posts; subsequent pages from cache
-      if (page === 1) return posts;
+      // All categories: use page 1 from main posts (or override); subsequent pages from cache
+      if (page === 1)
+        return allPostsOverride !== undefined ? allPostsOverride : posts;
       return generalPostsByPage[page] || [];
     }
     return categoryPosts[selectedCategory] || [];
-  }, [posts, selectedCategory, categoryPosts, page, generalPostsByPage]);
+  }, [
+    posts,
+    allPostsOverride,
+    selectedCategory,
+    categoryPosts,
+    page,
+    generalPostsByPage,
+  ]);
 
   const isLoading = selectedCategory
     ? categoryPostsLoading[selectedCategory] || false
