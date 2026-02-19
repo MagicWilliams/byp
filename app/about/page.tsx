@@ -157,9 +157,9 @@ export default async function About() {
               <h3 className="text-[2rem]" style={{ fontFamily: 'Playfair' }}>
                 Our History
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-8 w-full">
                 {(data.history_sections ?? []).map((section, i) => (
-                  <div key={i} className="flex flex-col gap-4">
+                  <div key={i} className="flex flex-col gap-4 w-full">
                     <h4
                       className="text-[1.5rem] font-medium"
                       style={{
@@ -179,20 +179,17 @@ export default async function About() {
                         __html: sanitizeHtmlWithBreaks(section.content),
                       }}
                     />
-                    {i === 1 &&
-                      data.history_cta_text &&
-                      data.history_cta_url && (
-                        <Link
-                          className="text-lg underline text-blue-300 hover:text-blue-200"
-                          href={data.history_cta_url}
-                          style={{ fontFamily: 'Playfair' }}
-                        >
-                          {data.history_cta_text} →
-                        </Link>
-                      )}
                   </div>
                 ))}
-                <div></div>
+                {data.history_cta_text && data.history_cta_url && (
+                  <Link
+                    className="text-lg underline text-blue-300 hover:text-blue-200 mt-2"
+                    href={data.history_cta_url}
+                    style={{ fontFamily: 'Playfair' }}
+                  >
+                    {data.history_cta_text} →
+                  </Link>
+                )}
               </div>
             </div>
           </section>

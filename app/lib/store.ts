@@ -924,7 +924,7 @@ export const useSiteStore = create<SiteState>()(
       },
 
       fetchBLEMorePosts: async (params = {}) => {
-        const { force = false, per_page = 8 } = params;
+        const { force = false, per_page = 6 } = params;
         const state = get();
 
         if (

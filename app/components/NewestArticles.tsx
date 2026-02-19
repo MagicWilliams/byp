@@ -80,7 +80,7 @@ export default function NewestArticles({
 
   useEffect(() => {
     if (isBle) {
-      fetchBLEMorePosts({ per_page: 8 });
+      fetchBLEMorePosts({ per_page: 6 });
     }
     // For standard behavior, we don't need to fetch posts here
     // The main page already fetches all posts, and we'll slice them on the frontend
@@ -143,14 +143,14 @@ export default function NewestArticles({
       >
         {displayLoading ? (
           // Show skeleton loaders while loading
-          Array.from({ length: isBle ? 8 : 5 }).map((_, index) => (
+          Array.from({ length: isBle ? 6 : 5 }).map((_, index) => (
             <ArticlePreviewSkeleton key={index} isBle={isBle} />
           ))
         ) : displayError ? (
           <div>Error loading articles: {displayError}</div>
         ) : (
           // Show actual articles when loaded
-          displayPosts.slice(0, isBle ? 8 : 5).map(post => (
+          displayPosts.slice(0, isBle ? 6 : 5).map(post => (
             <div
               className="w-[66%] md:w-[32%] max-w-sm flex-shrink-0"
               key={post.id}
