@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
       queryParams.append('slug', slug);
     } else {
       // Default behavior when no slug is provided
-      queryParams.append('per_page', '10');
+      // Fetch extra to compensate for excluded categories (Video, Guest Post)
+      queryParams.append('per_page', '15');
       queryParams.append('orderby', 'count');
       queryParams.append('order', 'desc');
       queryParams.append('hide_empty', 'true');
@@ -32,7 +33,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const categories = await response.json();
+    let categories = await response.json();
+
+    // Exclude Video and Guest Post from the categories section (no content)
+    if (!slug) {
+      const excludedNames = ['Video', 'Guest Post'];
+      categories = categories.filter(
+        (cat: { name?: string }) =>
+          !excludedNames.includes(cat.name ?? '')
+      );
+    }
+
     return NextResponse.json(categories);
   } catch (error) {
     console.error('Error fetching categories:', error);

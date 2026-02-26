@@ -2,13 +2,10 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ArticlePreview from '../components/ArticlePreview';
+import { deslugify } from '../lib/utils';
 import {
-  fetchTagBySlug,
-  fetchPostsByTagSlug,
   fetchPostsSearch,
-  fetchPostsSearchWithTag,
   WordPressPost,
-  WordPressTag,
 } from '../lib/wordpress';
 
 const PER_PAGE = 12;
@@ -19,15 +16,13 @@ interface SearchPageProps {
 
 export async function generateMetadata({ searchParams }: SearchPageProps) {
   const { q, tag } = await searchParams;
-  if (tag && !q) {
-    const t = await fetchTagBySlug(tag);
-    const title = t ? `Tag: ${t.name}` : 'Search';
-    return { title: `${title} | Black Youth Project` };
-  }
-  if (q) {
+  const qTrim = q?.trim();
+  const tagTrim = tag?.trim();
+  const displayTerm = qTrim || (tagTrim ? deslugify(tagTrim) : '');
+  if (displayTerm) {
     return {
-      title: `Search: ${q} | Black Youth Project`,
-      description: `Articles matching "${q}"`,
+      title: `Search: ${displayTerm} | Black Youth Project`,
+      description: `Articles matching "${displayTerm}"`,
     };
   }
   return { title: 'Search | Black Youth Project' };
@@ -47,37 +42,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const qTrim = q?.trim();
   const tagTrim = tag?.trim();
 
+  // When tag param is present (e.g. from /tag/gender-performance redirect),
+  // use deslugified form as the search query so we get results as if a human typed it
+  const effectiveQuery = qTrim || (tagTrim ? deslugify(tagTrim) : '');
+
   let posts: WordPressPost[] = [];
   let total = 0;
-  let tagInfo: WordPressTag | null = null;
-  let tagNotFound = false;
 
-  if (tagTrim) {
-    tagInfo = await fetchTagBySlug(tagTrim);
-    if (!tagInfo) {
-      tagNotFound = true;
-    }
-  }
-
-  if (tagNotFound) {
-    posts = [];
-    total = 0;
-  } else if (tagTrim && qTrim) {
-    const result = await fetchPostsSearchWithTag(tagTrim, qTrim, {
-      per_page: PER_PAGE,
-      page: pageNum,
-    });
-    posts = result.posts;
-    total = result.total;
-  } else if (tagTrim && tagInfo) {
-    const result = await fetchPostsByTagSlug(tagTrim, {
-      per_page: PER_PAGE,
-      page: pageNum,
-    });
-    posts = result.posts;
-    total = result.total;
-  } else if (qTrim) {
-    const result = await fetchPostsSearch(qTrim, {
+  if (effectiveQuery) {
+    const result = await fetchPostsSearch(effectiveQuery, {
       per_page: PER_PAGE,
       page: pageNum,
     });
@@ -85,15 +58,15 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     total = result.total;
   }
 
-  const hasQuery = Boolean(qTrim || tagTrim);
+  const hasQuery = Boolean(effectiveQuery);
   const isEmpty = hasQuery && posts.length === 0;
-  const showResults = hasQuery && !tagNotFound && posts.length > 0;
+  const showResults = hasQuery && posts.length > 0;
 
   const totalPages = Math.ceil(total / PER_PAGE);
   const nextPage = pageNum < totalPages ? pageNum + 1 : null;
   const prevPage = pageNum > 1 ? pageNum - 1 : null;
 
-  const displayTerm = qTrim || tagInfo?.name || tagTrim || '';
+  const displayTerm = effectiveQuery;
 
   return (
     <div className="min-h-screen w-full bg-black">
@@ -124,7 +97,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               id="search-q"
               type="search"
               name="q"
-              defaultValue={qTrim ?? ''}
+              defaultValue={displayTerm}
               placeholder="Search by title or content..."
               className="w-full bg-transparent text-white placeholder-white/50 text-lg md:text-xl py-4 outline-none border-0"
               style={{ fontFamily: 'Gill Sans' }}
@@ -150,23 +123,6 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         </form>
 
-        {tagNotFound && (
-          <div
-            className="rounded-lg border border-white/20 bg-white/5 text-white px-4 py-6 text-center"
-            style={{ fontFamily: 'Playfair' }}
-          >
-            <p className="text-lg">
-              No tag found for &ldquo;{tagTrim}&rdquo;. Try a different tag or search by text above.
-            </p>
-            <Link
-              href="/search"
-              className="mt-4 inline-block text-white hover:underline font-medium"
-            >
-              Clear and search again
-            </Link>
-          </div>
-        )}
-
         {!hasQuery && (
           <div
             className="rounded-lg border border-white/20 bg-white/5 text-white/80 px-4 py-8 text-center"
@@ -178,14 +134,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         )}
 
-        {isEmpty && !tagNotFound && (
+        {isEmpty && (
           <div
             className="rounded-lg border border-white/20 bg-white/5 text-white/80 px-4 py-8 text-center"
             style={{ fontFamily: 'Playfair' }}
           >
             <p className="text-lg">
-              No articles found for {tagTrim && qTrim ? 'this tag and search' : tagTrim ? 'this tag' : 'your search'}.
-              Try a different search or tag.
+              No articles found for &ldquo;{displayTerm}&rdquo;.
+              Try a different search.
             </p>
           </div>
         )}

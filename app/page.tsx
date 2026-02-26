@@ -22,7 +22,8 @@ export default function Home() {
 
   useEffect(() => {
     // Fetch data only if we don't have it or if it's stale
-    fetchPosts({ per_page: 15, page: 1 });
+    // Over-fetch (50) so that after BLE filtering we have at least 10 for Categories "All"
+    fetchPosts({ per_page: 50, page: 1 });
     fetchCategories();
     fetchTags();
   }, [fetchPosts, fetchCategories, fetchTags]);

@@ -61,7 +61,7 @@ const Issue: React.FC<IssueProps> = ({
   collapsed,
   onToggle,
 }) => {
-  const { gradientstart, gradientend } = issue.acf;
+  const { gradientstart, gradientend, invert_text } = issue.acf;
   const gradient = `linear-gradient(to right, ${gradientstart}, ${gradientend})`;
   const brighterBackground = makeColorBrighter(gradientstart);
   const dateStr = new Date(issue.date).toLocaleDateString('en-US', {
@@ -171,10 +171,12 @@ const Issue: React.FC<IssueProps> = ({
                 />
               </div>
             )}
-            {/* Placeholder Caption */}
-            <div className="text-xs text-gray-600 px-6 text-left mt-4 mb-8 max-w-7xl mx-auto">
-              Photo Credit: Placeholder Caption
-            </div>
+            {/* Photo caption from WordPress Media Library */}
+            {issue.featured_image_caption && (
+              <div className="text-xs text-gray-600 px-6 text-left mt-4 mb-8 max-w-7xl mx-auto">
+                Photo Credit: {issue.featured_image_caption}
+              </div>
+            )}
 
             {/* About Issue - Centered layout */}
             <div
@@ -183,13 +185,17 @@ const Issue: React.FC<IssueProps> = ({
             >
               <div className="flex flex-col items-center text-center">
                 <span
-                  className="text-xs uppercase tracking-[0.25em] text-black/60 mb-3 block"
+                  className={`text-xs uppercase tracking-[0.25em] mb-3 block ${
+                    invert_text ? 'text-white/60' : 'text-black/60'
+                  }`}
                   style={{ fontFamily: 'Gill Sans' }}
                 >
                   In this issue
                 </span>
                 <h3
-                  className="text-2xl md:text-3xl mb-6 text-black"
+                  className={`text-2xl md:text-3xl mb-6 ${
+                    invert_text ? 'text-white' : 'text-black'
+                  }`}
                   style={{
                     fontFamily: 'Playfair Display, serif',
                     fontWeight: 600,
@@ -198,7 +204,9 @@ const Issue: React.FC<IssueProps> = ({
                   About {issue.title.rendered}
                 </h3>
                 <div
-                  className="about-issue-content about-issue-centered text-black text-lg md:text-xl leading-relaxed w-full max-w-[75%] mx-auto"
+                  className={`about-issue-content about-issue-centered text-lg md:text-xl leading-relaxed w-full max-w-[75%] mx-auto ${
+                    invert_text ? 'text-white' : 'text-black'
+                  }`}
                   style={{
                     fontFamily: 'Playfair Display, Georgia, serif',
                     textAlign: 'center',

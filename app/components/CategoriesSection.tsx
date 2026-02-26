@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useSiteStore } from '../lib/store';
 import ArticlePreview from './ArticlePreview';
-import { WordPressCategory, WordPressPost } from '../lib/wordpress';
+import { WordPressCategory, WordPressPost, isBLEPost } from '../lib/wordpress';
 
 // Skeleton component for article previews in grid layout
 function ArticlePreviewSkeleton() {
@@ -45,6 +45,7 @@ export default function CategoriesSection({
     categoryPosts,
     categoryPostsLoading,
     categoryPostsError,
+    tags,
     fetchPostsByCategoryId,
     fetchLatestPostsPage,
     generalPostsByPage,
@@ -60,7 +61,8 @@ export default function CategoriesSection({
     } else {
       // For "All" we fetch by page beyond page 1 as needed
       if (page > 1) {
-        fetchLatestPostsPage({ page, per_page: 15 });
+        // Over-fetch (50) so that after BLE filtering we have at least 10
+        fetchLatestPostsPage({ page, per_page: 50 });
       }
     }
   }, [selectedCategory, page, fetchPostsByCategoryId, fetchLatestPostsPage]);
@@ -71,13 +73,20 @@ export default function CategoriesSection({
   }, [selectedCategory]);
 
   const filteredPosts = useMemo(() => {
+    let rawPosts: WordPressPost[];
     if (!selectedCategory) {
       // All categories: use page 1 from main posts (or override); subsequent pages from cache
       if (page === 1)
-        return allPostsOverride !== undefined ? allPostsOverride : posts;
-      return generalPostsByPage[page] || [];
+        rawPosts =
+          allPostsOverride !== undefined ? allPostsOverride : posts;
+      else rawPosts = generalPostsByPage[page] || [];
+    } else {
+      rawPosts = categoryPosts[selectedCategory] || [];
     }
-    return categoryPosts[selectedCategory] || [];
+    // Exclude BLE content from Categories section (same as home page)
+    return rawPosts.filter(
+      post => !isBLEPost(post, { categories, tags })
+    ) as WordPressPost[];
   }, [
     posts,
     allPostsOverride,
@@ -85,6 +94,8 @@ export default function CategoriesSection({
     categoryPosts,
     page,
     generalPostsByPage,
+    categories,
+    tags,
   ]);
 
   const isLoading = selectedCategory

@@ -234,7 +234,7 @@ export interface BLEAssociatedPost {
   post_name: string;
   guid: string;
   jetpack_featured_media_url: string;
-  author: WordPressUser;
+  author: WordPressUser | null;
 }
 
 export interface PageResults {
@@ -258,10 +258,14 @@ export interface BLEIssue {
   modified: string;
   featured_media: number;
   featured_image_url: string | null;
+  /** Caption from the featured image in WordPress Media Library. */
+  featured_image_caption: string | null;
   acf: {
     associated_posts: BLEAssociatedPost[];
     gradientstart: string;
     gradientend: string;
+    /** When true, use white text in the "About this issue" section (for dark gradient backgrounds). */
+    invert_text?: boolean;
   };
 }
 
@@ -301,15 +305,20 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
     const issuesWithImages = await Promise.all(
       issues.map(async issue => {
         let featured_image_url: string | null = null;
+        let featured_image_caption: string | null = null;
         if (issue.featured_media) {
-          featured_image_url = await getFeaturedImageUrl(issue.featured_media);
+          const details = await getFeaturedImageDetails(issue.featured_media);
+          if (details) {
+            featured_image_url = details.url;
+            featured_image_caption = details.caption;
+          }
         }
         if (issue.acf && Array.isArray(issue.acf.associated_posts)) {
           issue.acf.associated_posts = await Promise.all(
             issue.acf.associated_posts.map(async (post: BLEAssociatedPost) => {
               try {
                 const wpPostRes = await fetch(
-                  `${WORDPRESS_API_URL}/posts/${post.ID}`,
+                  `${WORDPRESS_API_URL}/posts/${post.ID}?_embed=author`,
                   {
                     next: { revalidate: 300 }, // Cache for 5 minutes
                   }
@@ -321,19 +330,61 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
                     }`
                   );
                 const wpPost = await wpPostRes.json();
-                let authorDetails = null;
-                if (wpPost.author) {
-                  const authorRes = await fetch(
-                    `${WORDPRESS_API_URL}/users/${wpPost.author}`,
-                    {
-                      headers: {
-                        Authorization: getAuthHeader(),
-                      },
-                      next: { revalidate: 300 }, // Cache for 5 minutes
+                let authorDetails: WordPressUser | null = null;
+
+                // Prefer PublishPress Multi-Authors (ppma_author) - authors are in wpPost.authors
+                const ppmaAuthors = wpPost.authors;
+                if (
+                  Array.isArray(ppmaAuthors) &&
+                  ppmaAuthors.length > 0 &&
+                  ppmaAuthors[0]?.display_name
+                ) {
+                  const a = ppmaAuthors[0];
+                  authorDetails = {
+                    id: a.user_id ?? 0,
+                    name: a.display_name,
+                    username: a.slug ?? '',
+                    description: a.description ?? '',
+                    avatar_urls: a.avatar_url
+                      ? { 96: a.avatar_url }
+                      : undefined,
+                  };
+                }
+
+                // Fallback: standard _embedded.author (often blocked by Wordfence)
+                if (!authorDetails) {
+                  const embedded =
+                    wpPost._embedded?.author?.[0] ?? null;
+                  const isErrorObject =
+                    embedded &&
+                    typeof embedded === 'object' &&
+                    'code' in embedded;
+                  if (!isErrorObject && embedded?.name) {
+                    authorDetails = embedded as WordPressUser;
+                  }
+                }
+
+                // Last resort: try authenticated users API (may also 404)
+                if (!authorDetails) {
+                  const authorId =
+                    wpPost.author ?? wpPost.post_author;
+                  if (authorId) {
+                    try {
+                      const authorRes = await fetch(
+                        `${WORDPRESS_API_URL}/users/${authorId}`,
+                        {
+                          headers: {
+                            Authorization: getAuthHeader(),
+                          },
+                          next: { revalidate: 300 },
+                        }
+                      );
+                      if (authorRes.ok) {
+                        authorDetails = await authorRes.json();
+                      }
+                    } catch {
+                      /* ignore */
                     }
-                  );
-                  if (authorRes.ok) {
-                    authorDetails = await authorRes.json();
                   }
                 }
                 return {
@@ -356,6 +407,7 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
         return {
           ...issue,
           featured_image_url,
+          featured_image_caption,
         };
       })
     );
@@ -371,6 +423,17 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
 export async function getFeaturedImageUrl(
   mediaId: number
 ): Promise<string | null> {
+  const details = await getFeaturedImageDetails(mediaId);
+  return details?.url ?? null;
+}
+
+/**
+ * Fetch featured image URL and caption from WordPress media.
+ * Used for BLE issue hero images where the caption is displayed.
+ */
+export async function getFeaturedImageDetails(
+  mediaId: number
+): Promise<{ url: string; caption: string | null } | null> {
   try {
     const response = await fetch(`${WORDPRESS_API_URL}/media/${mediaId}`, {
       next: { revalidate: 300 }, // Cache for 5 minutes
@@ -383,7 +446,23 @@ export async function getFeaturedImageUrl(
     }
 
     const media = await response.json();
-    return media.source_url || null;
+    const url = media.source_url || null;
+    if (!url) return null;
+
+    // caption.rendered is HTML; caption.raw is plain (edit context). Strip HTML for display.
+    const captionObj = media.caption;
+    let caption: string | null = null;
+    if (captionObj) {
+      const raw = captionObj.raw;
+      const rendered = captionObj.rendered;
+      if (typeof raw === 'string' && raw.trim()) {
+        caption = raw.trim();
+      } else if (typeof rendered === 'string' && rendered.trim()) {
+        caption = rendered.replace(/<[^>]+>/g, '').trim();
+      }
+    }
+
+    return { url, caption };
   } catch (error) {
     console.error('Error fetching featured image:', error);
     return null;

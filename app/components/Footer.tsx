@@ -30,9 +30,9 @@ export default function Footer() {
             href="https://www.instagram.com/blackyouthproject"
           />
           <Icon
-            name="Twitter"
-            imagePath="/img/twitter.svg"
-            href="https://x.com/BlackYouthProj"
+            name="Threads"
+            imagePath="/img/threads.svg"
+            href="https://threads.com/@blackyouthproject"
           />
           <Icon
             name="Youtube"

@@ -74,6 +74,8 @@ Under the main editor, you'll see a custom meta box titled **Issue Extras**. Thi
 
   The goal is to give each issue its own feel while staying brand-consistent.
 
+- **Invert Text** — A true/false toggle. When **true**, the "About this issue" section uses white text instead of black. Use this when the gradient start color is dark and the "About this issue" background makes black text hard to read. When **false** (default), text remains black. *(ACF field name: `invert_text`)*
+
 ### Publishing Workflow
 
 Publishing an issue is no different than publishing a post:
