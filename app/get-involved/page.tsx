@@ -113,8 +113,9 @@ export default async function GetInvolved() {
                 />
                 {' '}
                 <Link
-                  className="underline hover:no-underline text-blue-300 hover:text-blue-200"
+                  className="text-xl underline hover:no-underline text-blue-300 hover:text-blue-200"
                   href={`mailto:${data.pitch_email ?? 'info@blackyouthproject.com'}`}
+                  style={{ fontFamily: 'Playfair' }}
                 >
                   {data.pitch_email ?? 'info@blackyouthproject.com'}
                 </Link>
@@ -135,21 +136,23 @@ export default async function GetInvolved() {
                 />
                 {' '}
                 <Link
-                  className="underline hover:no-underline text-blue-300 hover:text-blue-200"
+                  className="text-xl underline hover:no-underline text-blue-300 hover:text-blue-200"
                   href={`mailto:${data.republish_email ?? 'info@blackyouthproject.com'}`}
+                  style={{ fontFamily: 'Playfair' }}
                 >
                   {data.republish_email ?? 'info@blackyouthproject.com'}
                 </Link>
                 <br />
                 <br />
-                Learn more about submitting to BYP on our official{' '}
-                <Link
-                  className="underline hover:no-underline text-blue-300 hover:text-blue-200"
-                  href={data.submissions_link ?? '/submissions'}
-                >
-                  submissions page
-                </Link>
-                .
+                <span className="text-xl text-white" style={{ fontFamily: 'Playfair' }}>
+                  Learn more about submitting to BYP on our official{' '}
+                  <Link
+                    className="underline hover:no-underline text-blue-300 hover:text-blue-200"
+                    href={data.submissions_link ?? '/submissions'}
+                  >
+                    submissions page
+                  </Link>
+                </span>
               </div>
             </div>
           </section>

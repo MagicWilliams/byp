@@ -43,8 +43,8 @@ export default function Footer() {
 
         {/* Navigation Links */}
         <nav
-          style={{ fontFamily: 'Gill Sans' }}
-          className="w-full max-w-7xl flex flex-wrap text-center font-medium justify-center space-x-4 space-y-4 mb-8 text-sm"
+          style={{ fontFamily: 'var(--font-playfair-display), Georgia, serif' }}
+          className="w-full max-w-7xl flex flex-wrap text-center font-medium justify-center space-x-4 space-y-4 mb-8 text-base"
         >
           <Link href="/contact">Contact Us</Link>
           <Link href="/terms">Terms</Link>

@@ -170,7 +170,7 @@ export default function Terms() {
               </h3>
               <p className="text-xl" style={{ fontFamily: 'Playfair' }}>
                 If you have any questions about these Terms of Service, please
-                contact us at legal@byp.com.
+                contact us at info@blackyouthproject.com.
               </p>
             </div>
           </section>

@@ -143,6 +143,7 @@ h1, h2, h3, h4, h5, h6 {
   color: #2563eb;
   text-decoration: underline;
   font-weight: 500;
+  font-family: var(--font-playfair-display), Georgia, serif;
 }
 
 .prose strong {
@@ -484,6 +485,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .prose > :last-child {
   margin-bottom: 0;
+}
+
+.article-content a {
+  font-family: var(--font-playfair-display), Georgia, serif;
 }
 
 .article-content img {
