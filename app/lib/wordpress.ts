@@ -72,6 +72,14 @@ export interface WordPressPost {
   post_author: number;
   post_parent: number;
   post_type: string;
+  /** PublishPress Multi-Authors - use when _embedded.author is blocked (e.g. Wordfence) */
+  authors?: Array<{
+    user_id?: number;
+    slug?: string;
+    display_name?: string;
+    avatar_url?: string;
+    description?: string;
+  }>;
 }
 
 export interface WordPressPage {

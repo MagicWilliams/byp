@@ -14,9 +14,14 @@ export interface FeaturedPostProps {
     };
     _embedded?: {
       author?: Array<{
-        name: string;
+        name?: string;
+        code?: string;
       }>;
     };
+    /** PublishPress Multi-Authors - preferred when _embedded.author is blocked */
+    authors?: Array<{
+      display_name?: string;
+    }>;
   };
   loading?: boolean;
 }
@@ -80,9 +85,17 @@ export default function FeaturedPost({
     return <FeaturedPostSkeleton />;
   }
 
-  const author = featuredPost._embedded?.author?.[0] || {
-    name: 'Example Author (HC)',
-  };
+  // Prefer PublishPress Multi-Authors (authors array) when _embedded.author is blocked
+  const ppmaAuthor = featuredPost.authors?.[0]?.display_name;
+  const embeddedAuthor = featuredPost._embedded?.author?.[0];
+  const isEmbeddedError =
+    embeddedAuthor &&
+    typeof embeddedAuthor === 'object' &&
+    'code' in embeddedAuthor;
+  const authorName =
+    ppmaAuthor ||
+    (!isEmbeddedError && embeddedAuthor?.name) ||
+    'Contributors';
 
   return (
     <section className="relative text-white overflow-hidden max-w-7xl mx-auto">
@@ -124,14 +137,12 @@ export default function FeaturedPost({
                 >
                   Featured Article
                 </p>
-                {author && (
-                  <p
-                    className="text-md italic mb-4"
-                    style={{ fontFamily: 'Playfair Display' }}
-                  >
-                    by {author.name || 'Contributors'}
-                  </p>
-                )}
+                <p
+                  className="text-md italic mb-4"
+                  style={{ fontFamily: 'Playfair Display' }}
+                >
+                  by {authorName}
+                </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <Link
