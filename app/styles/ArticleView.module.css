@@ -30,6 +30,7 @@
 .article a {
   text-decoration: underline;
   color: #d90103;
+  font-size: 1.1rem !important;
 }
 
 .article video {

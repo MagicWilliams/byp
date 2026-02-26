@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import BLEArticlePreview from './BLEArticlePreview';
 import { BLEAssociatedPost, BLEIssue } from '../lib/wordpress';
+import { rewriteWpLinks } from '../lib/sanitize';
 
 interface IssueProps {
   issue: BLEIssue;
@@ -211,7 +212,7 @@ const Issue: React.FC<IssueProps> = ({
                     fontFamily: 'Playfair Display, Georgia, serif',
                     textAlign: 'center',
                   }}
-                  dangerouslySetInnerHTML={{ __html: issue.content.rendered }}
+                  dangerouslySetInnerHTML={{ __html: rewriteWpLinks(issue.content.rendered) }}
                 />
               </div>
             </div>

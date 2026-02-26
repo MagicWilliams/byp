@@ -14,6 +14,7 @@ import {
   fetchTagsByIds,
   WordPressUser,
 } from '../lib/wordpress';
+import { rewriteWpLinks } from '../lib/sanitize';
 import Header from './Header';
 import Tag from './Tag';
 import RelatedArticles from './RelatedArticles';
@@ -190,7 +191,7 @@ export default function ArticleView({ slug }: ArticleViewProps) {
                 ' max-w-7xl mx-auto text-xl text-black border-b-0 article-content'
               }
               style={{ fontFamily: 'Playfair' }}
-              dangerouslySetInnerHTML={{ __html: post.content.rendered }}
+              dangerouslySetInnerHTML={{ __html: rewriteWpLinks(post.content.rendered) }}
             />
           </div>
         </article>

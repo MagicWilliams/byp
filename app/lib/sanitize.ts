@@ -39,6 +39,57 @@ export function decodeHtmlEntities(str: string | undefined | null): string {
     .replace(/&nbsp;/g, ' ');
 }
 
+/** Known WordPress page slugs mapped to Next.js routes */
+const WP_PAGE_ROUTES: Record<string, string> = {
+  about: '/about',
+  contact: '/contact',
+  'get-involved': '/get-involved',
+  submissions: '/submissions',
+  terms: '/terms',
+};
+
+/**
+ * Rewrite wp.blackyouthproject.com URLs in HTML to equivalent blackyouthproject.com Next.js routes.
+ * Handles posts, tags, categories, authors, and known pages.
+ */
+export function rewriteWpLinks(html: string | undefined | null): string {
+  if (html == null || typeof html !== 'string') return '';
+
+  const wpUrlRegex =
+    /href=(["'])(https?:\/\/(?:www\.)?wp\.blackyouthproject\.com)([^"']*)\1/gi;
+
+  return html.replace(wpUrlRegex, (_, quote, _origin, pathAndRest) => {
+    const pathOnly = pathAndRest.split(/[?#]/)[0] || '';
+    const path = pathOnly.replace(/\/+$/, '').replace(/^\/+/, '') || '';
+    const segments = path.split('/').filter(Boolean);
+
+    if (segments.length === 0) {
+      return `href=${quote}/${quote}`;
+    }
+
+    const first = segments[0];
+    const second = segments[1];
+
+    if (first === 'tag' && second) {
+      return `href=${quote}/tag/${second}${quote}`;
+    }
+    if (first === 'category' && second) {
+      return `href=${quote}/search?tag=${encodeURIComponent(second)}${quote}`;
+    }
+    if (first === 'author' && second) {
+      return `href=${quote}/author/${second}${quote}`;
+    }
+
+    const knownPage = WP_PAGE_ROUTES[first];
+    if (knownPage) {
+      return `href=${quote}${knownPage}${quote}`;
+    }
+
+    const slug = segments[segments.length - 1];
+    return `href=${quote}/article/${slug}${quote}`;
+  });
+}
+
 /**
  * Strip all HTML tags, returning plain text. Use for headings/titles.
  */
