@@ -73,11 +73,27 @@ const SUBMISSIONS_FALLBACK: SubmissionsPageACF = {
     "If you have any questions about our submission process or guidelines, please don't hesitate to contact us at submissions@byp.com. We're here to help you share your work with our community.",
 };
 
+type RequirementRow = { requirement?: string; requirements?: string; text?: string; item?: string; value?: string };
+
 function normalizeRequirements(
-  requirements?: string | string[]
+  requirements?: string | string[] | Array<string | RequirementRow>
 ): string[] {
   if (!requirements) return [];
-  if (Array.isArray(requirements)) return requirements;
+  if (Array.isArray(requirements)) {
+    return requirements
+      .map((item) => {
+        if (typeof item === 'string') return item;
+        if (item && typeof item === 'object') {
+          const row = item as RequirementRow;
+          const text =
+            row.requirement ?? row.requirements ?? row.text ?? row.item ?? row.value ?? '';
+          return typeof text === 'string' ? text : '';
+        }
+        return '';
+      })
+      .map((s) => s.replace(/^[-*]\s*/, '').trim())
+      .filter(Boolean);
+  }
   return requirements
     .split(/\n/)
     .map((s) => s.replace(/^[-*]\s*/, '').trim())
@@ -93,7 +109,11 @@ export default async function Submissions() {
     ? { ...SUBMISSIONS_FALLBACK, ...acf }
     : SUBMISSIONS_FALLBACK;
 
-  const requirements = normalizeRequirements(data.requirements);
+  const rawRequirements = normalizeRequirements(data.requirements);
+  const requirements =
+    rawRequirements.length > 0
+      ? rawRequirements
+      : normalizeRequirements(SUBMISSIONS_FALLBACK.requirements);
 
   return (
     <div className="min-h-screen bg-white w-full">

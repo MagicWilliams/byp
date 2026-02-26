@@ -49,7 +49,7 @@ export default function Footer() {
           <Link href="/contact">Contact Us</Link>
           <Link href="/terms">Terms</Link>
           <Link href="/submissions">Submissions</Link>
-          <Link href="/donate">Donate</Link>
+          <Link href="https://giving.uchicago.edu/site/Donation2?df_id=1714&mfc_pref=T&1714.donation=form1">Donate</Link>
           <Link href="/about">About Us</Link>
         </nav>
 

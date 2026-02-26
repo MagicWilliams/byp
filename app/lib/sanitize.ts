@@ -1,4 +1,10 @@
-import DOMPurify from 'isomorphic-dompurify';
+import sanitizeHtmlLib from 'sanitize-html';
+
+const ALLOWED_TAGS = [
+  'p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li',
+  'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div',
+];
+const ALLOWED_ATTR = { a: ['href', 'target', 'rel'], '*': ['class'] };
 
 /**
  * Sanitize HTML from WordPress/ACF for safe rendering.
@@ -6,12 +12,9 @@ import DOMPurify from 'isomorphic-dompurify';
  */
 export function sanitizeHtml(html: string | undefined | null): string {
   if (html == null || typeof html !== 'string') return '';
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div',
-    ],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+  return sanitizeHtmlLib(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTR,
   });
 }
 
@@ -41,7 +44,7 @@ export function decodeHtmlEntities(str: string | undefined | null): string {
  */
 export function stripHtml(html: string | undefined | null): string {
   if (html == null || typeof html !== 'string') return '';
-  return DOMPurify.sanitize(html, { ALLOWED_TAGS: [] });
+  return sanitizeHtmlLib(html, { allowedTags: [], allowedAttributes: {} });
 }
 
 /**
@@ -58,12 +61,9 @@ export function sanitizeHtmlWithBreaks(
 
   // Already has block-level HTML - sanitize and return
   if (/<p[\s>]|<div[\s>]/.test(trimmed)) {
-    return DOMPurify.sanitize(trimmed, {
-      ALLOWED_TAGS: [
-        'p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li',
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div',
-      ],
-      ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+    return sanitizeHtmlLib(trimmed, {
+      allowedTags: ALLOWED_TAGS,
+      allowedAttributes: ALLOWED_ATTR,
     });
   }
 
@@ -76,11 +76,8 @@ export function sanitizeHtmlWithBreaks(
     })
     .join('');
 
-  return DOMPurify.sanitize(wrapped, {
-    ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'b', 'i', 'u', 'a', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div',
-    ],
-    ALLOWED_ATTR: ['href', 'target', 'rel', 'class'],
+  return sanitizeHtmlLib(wrapped, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: ALLOWED_ATTR,
   });
 }
