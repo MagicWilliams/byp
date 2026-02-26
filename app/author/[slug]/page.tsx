@@ -35,7 +35,6 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
       </div>
     );
   } catch (error) {
-    console.error('Error fetching author data:', error);
     notFound();
   }
 }

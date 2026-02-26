@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   description: 'The Black Youth Project',
 };
 
+const CONSOLE_SIGNATURE = `
+  (function() {
+    console.log('%c 🌼 🌠 🚀 Built by David Latimore II 🚀 🌠 🌼 ', 'font-size: 14px;');
+    console.log('%c 🌼 Delight — https://delight.studio 🌼', 'font-size: 14px;');
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,6 +35,11 @@ export default function RootLayout({
       <body
         className={`${inter.className} ${playfair.variable} ${playfairDisplay.variable}`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: CONSOLE_SIGNATURE,
+          }}
+        />
         {children}
       </body>
     </html>

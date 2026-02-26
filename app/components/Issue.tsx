@@ -180,7 +180,7 @@ const Issue: React.FC<IssueProps> = ({
 
             {/* About Issue - Centered layout */}
             <div
-              className="max-w-7xl mx-auto px-6 md:px-12 md:py-4 mb-8"
+              className="max-w-7xl mx-auto px-6 md:px-12 md:pb-4 mb-8"
               style={{ background: brighterBackground }}
             >
               <div className="flex flex-col items-center text-center">

@@ -66,7 +66,6 @@ async function fetchPostsByTagName(
   );
 
   if (!targetTag) {
-    console.warn(`Tag with slug "${slugifiedName}" not found`);
     return [];
   }
 
@@ -155,7 +154,6 @@ async function fetchPostsByCategoryName(
   );
 
   if (!targetCategory) {
-    console.warn(`Category with slug "${slugifiedName}" not found`);
     return [];
   }
 
@@ -448,11 +446,8 @@ export const useSiteStore = create<SiteState>()(
           state.postsCacheKey === cacheKey &&
           !isDataStale(state.postsLastFetched)
         ) {
-          console.log('Using cached posts data');
           return; // Use cached data
         }
-
-        console.log('Fetching posts with parameters:', standardizedParams);
 
         set({ postsLoading: true, postsError: null });
 
@@ -607,14 +602,8 @@ export const useSiteStore = create<SiteState>()(
           categoryPosts.length > 0 &&
           !isDataStale(categoryPostsLastFetched)
         ) {
-          console.log(`Using cached posts for category ${categoryId}`);
           return; // Use cached data
         }
-
-        console.log(
-          `Fetching posts for category ${categoryId} with parameters:`,
-          standardizedParams
-        );
 
         // Set loading state for this specific category
         set(state => ({
@@ -642,10 +631,6 @@ export const useSiteStore = create<SiteState>()(
             postsLastFetched: Date.now(),
           }));
         } catch (error) {
-          console.error(
-            `Error fetching posts for category ${categoryId}:`,
-            error
-          );
           set(state => ({
             categoryPostsError: {
               ...state.categoryPostsError,
@@ -697,7 +682,6 @@ export const useSiteStore = create<SiteState>()(
       },
 
       fetchAuthors: async (force = false) => {
-        console.log('fetching authors');
         const state = get();
 
         // Check if we have cached data and it's not stale
@@ -719,7 +703,6 @@ export const useSiteStore = create<SiteState>()(
             authorsLastFetched: Date.now(),
           });
         } catch (error) {
-          console.log('error', error);
           set({
             authorsError:
               error instanceof Error
@@ -1097,7 +1080,6 @@ export const useSiteStore = create<SiteState>()(
             try {
               return localStorage.getItem(name);
             } catch (error) {
-              console.warn('Failed to read from localStorage:', error);
               return null;
             }
           },
@@ -1106,16 +1088,12 @@ export const useSiteStore = create<SiteState>()(
             try {
               localStorage.setItem(name, value);
             } catch (error) {
-              console.warn(
-                'Failed to write to localStorage (quota exceeded):',
-                error
-              );
               // Clear some data to make space
               try {
                 localStorage.clear();
                 localStorage.setItem(name, value);
               } catch (clearError) {
-                console.error('Failed to clear localStorage:', clearError);
+                // Silently fail
               }
             }
           },
@@ -1124,7 +1102,7 @@ export const useSiteStore = create<SiteState>()(
             try {
               localStorage.removeItem(name);
             } catch (error) {
-              console.warn('Failed to remove from localStorage:', error);
+              // Silently fail
             }
           },
         };

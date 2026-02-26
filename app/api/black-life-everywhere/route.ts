@@ -9,7 +9,6 @@ export async function GET() {
     const issues = await fetchBlackLifeEverywhereIssues();
     return NextResponse.json({ issues });
   } catch (error) {
-    console.error('Error in black-life-everywhere API:', error);
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

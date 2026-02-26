@@ -10,7 +10,6 @@ export async function GET() {
 
     return NextResponse.json(issues);
   } catch (error) {
-    console.error('Error in issues API:', error);
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

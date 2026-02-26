@@ -394,7 +394,6 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
                   author: authorDetails,
                 };
               } catch (err) {
-                console.error('Error fetching associated post or author:', err);
                 return {
                   ...post,
                   jetpack_featured_media_url: null,
@@ -413,7 +412,6 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
     );
     return issuesWithImages;
   } catch (error) {
-    console.error('Error fetching BLE issues:', error);
     return [];
   }
 }
@@ -464,7 +462,6 @@ export async function getFeaturedImageDetails(
 
     return { url, caption };
   } catch (error) {
-    console.error('Error fetching featured image:', error);
     return null;
   }
 }
@@ -485,7 +482,6 @@ export async function fetchTags(): Promise<WordPressTag[]> {
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching tags:', error);
     return [];
   }
 }
@@ -510,7 +506,6 @@ export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.error('Error fetching tags by IDs:', error);
     return [];
   }
 }
@@ -536,7 +531,6 @@ export async function fetchTagBySlug(slug: string): Promise<WordPressTag | null>
     const list = await response.json();
     return Array.isArray(list) && list.length > 0 ? (list[0] as WordPressTag) : null;
   } catch (error) {
-    console.error('Error fetching tag by slug:', error);
     return null;
   }
 }
@@ -679,7 +673,6 @@ export async function fetchCategories(): Promise<WordPressCategory[]> {
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching categories:', error);
     return [];
   }
 }
@@ -717,7 +710,6 @@ export async function fetchPages(
 
     return await response.json();
   } catch (error) {
-    console.error('Error fetching pages:', error);
     return [];
   }
 }
@@ -751,7 +743,6 @@ export async function fetchPageBySlug(
     const pages: WordPressPage[] = await response.json();
     return Array.isArray(pages) && pages.length > 0 ? pages[0] : null;
   } catch (error) {
-    console.error('Error fetching page by slug:', error);
     return null;
   }
 }
@@ -813,7 +804,6 @@ export async function fetchPost(
 
     return post as WordPressPost;
   } catch (error) {
-    console.error('Error fetching post:', error);
     return null;
   }
 }
@@ -874,7 +864,6 @@ export async function fetchAuthors(): Promise<WordPressUser[]> {
     // You can remove this filter if you want to show all users
     return users.filter(user => user.slug && user.name);
   } catch (error) {
-    console.error('Error fetching authors:', error);
     return [];
   }
 }
@@ -918,7 +907,6 @@ export async function fetchAuthorByUsername(
 
     return mappedUser;
   } catch (error) {
-    console.error('Error fetching author by username:', error);
     return null;
   }
 }
@@ -936,11 +924,9 @@ export async function fetchPostsByAuthor(
     page?: number;
   } = {}
 ): Promise<WordPressPost[]> {
-  console.log('fetching posts by author', username);
   try {
     // First get the author to get their username/slug and numeric ID
     const author = await fetchAuthorByUsername(username);
-    console.log('author', author);
     if (!author || !author.username || !author.id) {
       return [];
     }
@@ -958,7 +944,6 @@ export async function fetchPostsByAuthor(
       searchParams.append('page', params.page.toString());
     }
 
-    console.log(`${WORDPRESS_API_URL}/posts?${searchParams.toString()}`);
     const response = await fetch(
       `${WORDPRESS_API_URL}/posts?${searchParams.toString()}`
     );
@@ -1000,7 +985,6 @@ export async function fetchPostsByAuthor(
 
     return filtered as unknown as WordPressPost[];
   } catch (error) {
-    console.error('Error fetching posts by author:', error);
     return [];
   }
 }

@@ -21,7 +21,6 @@ export async function GET(
 
     return NextResponse.json(page);
   } catch (error) {
-    console.error('Error in pages API:', error);
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }
