@@ -34,7 +34,7 @@ export default async function AuthorPage({ params }: AuthorPageProps) {
         <Footer />
       </div>
     );
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

@@ -1079,7 +1079,7 @@ export const useSiteStore = create<SiteState>()(
             if (!isClient) return null;
             try {
               return localStorage.getItem(name);
-            } catch (error) {
+            } catch {
               return null;
             }
           },
@@ -1087,12 +1087,12 @@ export const useSiteStore = create<SiteState>()(
             if (!isClient) return;
             try {
               localStorage.setItem(name, value);
-            } catch (error) {
+            } catch {
               // Clear some data to make space
               try {
                 localStorage.clear();
                 localStorage.setItem(name, value);
-              } catch (clearError) {
+              } catch {
                 // Silently fail
               }
             }
@@ -1101,7 +1101,7 @@ export const useSiteStore = create<SiteState>()(
             if (!isClient) return;
             try {
               localStorage.removeItem(name);
-            } catch (error) {
+            } catch {
               // Silently fail
             }
           },

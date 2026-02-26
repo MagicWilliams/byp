@@ -1,4 +1,6 @@
 // WordPress API integration stubs
+import { decodeHtmlEntities } from './sanitize';
+
 // These functions will be implemented to fetch data from WordPress REST API
 
 export interface WordPressUser {
@@ -393,7 +395,7 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
                     wpPost.jetpack_featured_media_url || null,
                   author: authorDetails,
                 };
-              } catch (err) {
+              } catch {
                 return {
                   ...post,
                   jetpack_featured_media_url: null,
@@ -411,7 +413,7 @@ export async function fetchBlackLifeEverywhereIssues(): Promise<BLEIssue[]> {
       })
     );
     return issuesWithImages;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -447,21 +449,23 @@ export async function getFeaturedImageDetails(
     const url = media.source_url || null;
     if (!url) return null;
 
-    // caption.rendered is HTML; caption.raw is plain (edit context). Strip HTML for display.
+    // caption.rendered is HTML; caption.raw is plain (edit context). Strip HTML and decode entities.
     const captionObj = media.caption;
     let caption: string | null = null;
     if (captionObj) {
       const raw = captionObj.raw;
       const rendered = captionObj.rendered;
+      let text = '';
       if (typeof raw === 'string' && raw.trim()) {
-        caption = raw.trim();
+        text = raw.trim();
       } else if (typeof rendered === 'string' && rendered.trim()) {
-        caption = rendered.replace(/<[^>]+>/g, '').trim();
+        text = rendered.replace(/<[^>]+>/g, '').trim();
       }
+      caption = text ? decodeHtmlEntities(text) : null;
     }
 
     return { url, caption };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -481,7 +485,7 @@ export async function fetchTags(): Promise<WordPressTag[]> {
     }
 
     return await response.json();
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -505,7 +509,7 @@ export async function fetchTagsByIds(ids: number[]): Promise<WordPressTag[]> {
     );
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -530,7 +534,7 @@ export async function fetchTagBySlug(slug: string): Promise<WordPressTag | null>
     if (!response.ok) return null;
     const list = await response.json();
     return Array.isArray(list) && list.length > 0 ? (list[0] as WordPressTag) : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -672,7 +676,7 @@ export async function fetchCategories(): Promise<WordPressCategory[]> {
     }
 
     return await response.json();
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -709,7 +713,7 @@ export async function fetchPages(
     }
 
     return await response.json();
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -742,7 +746,7 @@ export async function fetchPageBySlug(
     if (!response.ok) return null;
     const pages: WordPressPage[] = await response.json();
     return Array.isArray(pages) && pages.length > 0 ? pages[0] : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -803,7 +807,7 @@ export async function fetchPost(
     if (!post) return null;
 
     return post as WordPressPost;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -863,7 +867,7 @@ export async function fetchAuthors(): Promise<WordPressUser[]> {
     // Filter out users who haven't published any posts (optional)
     // You can remove this filter if you want to show all users
     return users.filter(user => user.slug && user.name);
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -906,7 +910,7 @@ export async function fetchAuthorByUsername(
     };
 
     return mappedUser;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -984,7 +988,7 @@ export async function fetchPostsByAuthor(
       : [];
 
     return filtered as unknown as WordPressPost[];
-  } catch (error) {
+  } catch {
     return [];
   }
 }

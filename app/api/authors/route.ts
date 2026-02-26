@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       const authors = await fetchAuthors();
       return NextResponse.json(authors);
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch authors' },
       { status: 500 }

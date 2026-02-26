@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const issues = await fetchBlackLifeEverywhereIssues();
     return NextResponse.json({ issues });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

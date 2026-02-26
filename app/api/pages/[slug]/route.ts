@@ -20,7 +20,7 @@ export async function GET(
     }
 
     return NextResponse.json(page);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const data = await wpRes.json();
 
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

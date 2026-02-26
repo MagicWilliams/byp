@@ -8,7 +8,7 @@ export async function GET() {
   try {
     const bleTags = await fetchTags();
     return NextResponse.json(bleTags);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: 'Unexpected server error' },
       { status: 500 }

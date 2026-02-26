@@ -16,6 +16,27 @@ export function sanitizeHtml(html: string | undefined | null): string {
 }
 
 /**
+ * Decode HTML entities (e.g. &#8211; → –, &amp; → &) to plain text.
+ * Use for captions and other WordPress content that may contain entities.
+ */
+export function decodeHtmlEntities(str: string | undefined | null): string {
+  if (str == null || typeof str !== 'string') return '';
+  return str
+    .replace(/&#(\d+);/g, (_, num) =>
+      String.fromCharCode(parseInt(num, 10))
+    )
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) =>
+      String.fromCharCode(parseInt(hex, 16))
+    )
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+}
+
+/**
  * Strip all HTML tags, returning plain text. Use for headings/titles.
  */
 export function stripHtml(html: string | undefined | null): string {
